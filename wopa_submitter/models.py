@@ -17,8 +17,7 @@ class Feedback(models.Model):
 class StuAssign(models.Model):
     student = models.ForeignKey(User)
     assignment = models.ForeignKey(Assignment)
-    marker=models.CharField(max_length=128,null=True)
-    feedback=models.ForeignKey(Feedback)
+    feedback=models.ForeignKey(Feedback,null=True)
     marked=models.BooleanField(default=False)
     documents = models.ForeignKey(Document,null=True)
     submitted=models.BooleanField(default=False)
