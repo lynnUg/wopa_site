@@ -24,7 +24,7 @@ class AssignmentForm(forms.ModelForm):
     about=forms.CharField(widget=forms.Textarea)
     class Meta:
     	model=Assignment
-    	fields = ('name','about')
+    	fields = ('name','about','publish')
 class StuAssignmentForm(forms.ModelForm):
     class Meta:
     	model=StuAssign

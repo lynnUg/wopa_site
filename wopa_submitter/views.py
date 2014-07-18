@@ -3,10 +3,12 @@ from wopa_submitter.forms import UserForm,DocumentForm, AssignmentForm,StuAssign
 from django.template import RequestContext
 from django.shortcuts import render_to_response
 from django.http import HttpResponseRedirect ,HttpResponse
-from wopa_submitter.models import Document
+from wopa_submitter.models import Document ,StuAssign
 from django.core.urlresolvers import reverse
 from django.contrib.auth import logout,authenticate,login
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.models import User
+
 
 def user_login(request):
     # Like before, obtain the context for the user's request.
@@ -45,7 +47,8 @@ def user_logout(request):
 def index(request):
     #print "in index"
     context = RequestContext(request)
-    return render_to_response('index.html', {}, context)
+    assignmentsForUser=StuAssign.objects.filter(student=request.user)
+    return render_to_response('wopa-submitter/index.html', {'assignmentsForUser':assignmentsForUser}, context)
 def list(request):
     # Handle file upload
     if request.method == 'POST':
@@ -101,6 +104,10 @@ def createAssignment(request):
             assignment = assignment_form .save()
             print "in create assignment"
             assignment.save()
+            if assignment.publish==True:
+                users=User.objects.all()
+                for student in users:
+                    assigntoStu=StuAssign.objects.create(student=student,assignment=assignment)
             created=True;
             
         else:
