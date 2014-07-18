@@ -10,13 +10,17 @@ class Assignment(models.Model):
     publish=models.BooleanField(default=False)
     def __unicode__(self):
         return self.name
+class Feedback(models.Model):
+    thefeedback=models.TextField()
+    marker=models.ForeignKey(User)
 
 class StuAssign(models.Model):
-    student = models.ForeignKey(User )
+    student = models.ForeignKey(User)
     assignment = models.ForeignKey(Assignment)
-    marker=models.CharField(max_length=128)
-    feedback=models.TextField()
+    marker=models.CharField(max_length=128,null=True)
+    feedback=models.ForeignKey(Feedback)
     marked=models.BooleanField(default=False)
     documents = models.ForeignKey(Document,null=True)
-    date_submitted = models.DateField()
+    submitted=models.BooleanField(default=False)
+    date_submitted = models.DateField(null=True)
 
