@@ -30,7 +30,7 @@ class AssignmentForm(forms.ModelForm):
 
     class Meta:
         model = Assignment
-        fields = ('name', 'about', 'publish')
+        fields = ('name', 'about', 'is_published')
 
 
 class StuAssignmentForm(forms.ModelForm):

@@ -115,7 +115,7 @@ def createAssignment(request):
             assignment = assignment_form.save()
             print "in create assignment"
             assignment.save()
-            if assignment.publish == True:
+            if assignment.is_published == True:
                 users = User.objects.all()
                 for student in users:
                     assigntoStu = Submission.objects.create(student=student, assignment=assignment)
