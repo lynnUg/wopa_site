@@ -17,9 +17,12 @@ urlpatterns = patterns('',
                        url(r'^admin/', include(admin.site.urls)),
                        url(r'^register/$', views.register, name='register'),  # ADD NEW PATTERN!
                        url(r'^createAssignment/$', views.createAssignment, name='createAssignment'),
+                       url(r'^assignments/$', views.Assignments.as_view(), name='assignments'),
                        url(r'^stuAssignment/$', views.stuAssignment, name='stuAssignment'),
                        url(r'^login/$', views.user_login, name='login'),
                        url(r'^logout/$', views.user_logout, name='logout'),
                        url(r'^list/$', views.list, name='list'),
+                       url(r'^readings/$', views.Reading.as_view(), name='reading'),
                        url(r'^$', views.index, name='index'),
+
 ) + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

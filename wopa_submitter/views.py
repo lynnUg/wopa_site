@@ -1,4 +1,6 @@
+from braces.views import LoginRequiredMixin
 from django.shortcuts import render
+from django.views.generic import TemplateView
 from wopa_submitter.forms import UserForm, DocumentForm, AssignmentForm, StuAssignmentForm
 from django.template import RequestContext
 from django.shortcuts import render_to_response
@@ -127,7 +129,7 @@ def createAssignment(request):
         assignment_form = AssignmentForm
 
     return render_to_response(
-        'wopa-submitter/assignment.html',
+        'wopa-submitter/assignments/assignment.html',
         {'assignment_form': assignment_form, 'created': created},
         context)
 
@@ -135,7 +137,7 @@ def createAssignment(request):
 def stuAssignment(request):
     # Like before, get the request's context.
     context = RequestContext(request)
-    created = False;
+    created = False
     if request.method == 'POST':
         stuAssignment_form = StuAssignmentForm(data=request.POST)
 
@@ -151,6 +153,14 @@ def stuAssignment(request):
         stuAssignment_form = StuAssignmentForm
 
     return render_to_response(
-        'wopa-submitter/stuassign.html',
+        'wopa-submitter/assignments/stuassign.html',
         {'stuAssignment_form': stuAssignment_form, 'created': created},
         context)
+
+
+class Reading(TemplateView, LoginRequiredMixin):
+    template_name = "wopa-submitter/readings/index.html"
+
+
+class Assignments(TemplateView, LoginRequiredMixin):
+    template_name = "wopa-submitter/assignments/index.html"
