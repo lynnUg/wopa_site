@@ -111,7 +111,7 @@ def createAssignment(request):
         assignment_document_form = AssignmentDocumentForm
 
 
-    return render_to_response('wopa_submitter/assignment.html',
+    return render_to_response('wopa_submitter/assignments/index.html',
         {'assignment_form': assignment_form,'assignment_document_form': assignment_document_form, 'created': created},context)
 
 
