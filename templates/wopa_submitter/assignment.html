@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+    <head>
+       
+    </head>
+
+    <body>
+        <h1>Assignment </h1>
+
+       {% if created %}
+        <strong>thank you for creating an assignment!</strong>
+        <a href="/">Return to the homepage.</a><br />
+
+
+        {{assignment.about}}
+        <form id="user_form" method="post" action="/submit/{{assignment.pk}}/"
+                enctype="multipart/form-data">
+        {% csrf_token %}
+        {{submission_document_form.as_p}}
+        <input type="submit" name="submit" value="Submit" />
+        </form>
+        {% else %}
+
+        <form id="user_form" method="post" action="{{redirectPage}}"
+                enctype="multipart/form-data">
+
+            {% csrf_token %}
+
+            <!-- Display each form. The as_p method wraps each element in a paragraph
+                 (<p>) element. This ensures each element appears on a new line,
+                 making everything look neater. -->
+            {{ assignment_form.as_p }}
+            {{ assignment_document_form.as_p }}
+
+            <!-- Provide a button to click to submit the form. -->
+            <input type="submit" name="submit" value="Register" />
+        </form>
+         {% endif %}
+    </body>
+</html>

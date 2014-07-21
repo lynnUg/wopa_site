@@ -1,23 +1,15 @@
 from django.db import models
 from django.contrib.auth.models import User
 # Create your models here.
-class Document(models.Model):
-    docfile = models.FileField(upload_to='documents/%Y/%m/%d')
-
-    def __unicode__(self):
-        return self.pk
-
 
 class Assignment(models.Model):
     name = models.CharField(max_length=128)
     about = models.TextField()
     details = models.TextField()
     is_published = models.BooleanField(default=False)
-    assignment_file = models.FileField(upload_to="assignments/%Y/%m/%d")
     due_date = models.DateField()
 
-    def __unicode__(self):
-        return self.name
+    
 
 
 class Feedback(models.Model):
@@ -27,20 +19,44 @@ class Feedback(models.Model):
     def __unicode__(self):
         return self.pk
 
+def submissionfile(self,filename):
+    #print filename
+    #self.filename=filename
+    url = "submissions/students/%s/%s" % (self.submitter.username,filename)
+    return url
+
+class SubmissionDocument(models.Model):
+    submitter=models.ForeignKey(User)
+    #filename=models.CharField(max_length=128)
+    docfile = models.FileField(upload_to=submissionfile)
+
 
 class Submission(models.Model):
     student = models.ForeignKey(User)
     assignment = models.ForeignKey(Assignment)
     feedback = models.ForeignKey(Feedback, null=True)
-    documents = models.ManyToManyField(Document, null=True)
     submitted = models.BooleanField(default=False)
     date_submitted = models.DateField(null=True)
-
+    submissions= models.ManyToManyField(SubmissionDocument,null=True)
 
 class Reading(models.Model):
     name = models.CharField(max_length=250)
-    file = models.FileField(upload_to="readings/%Y/%m/%d")
     message = models.TextField()
 
+
+
+class ReadingDocuments(models.Model):
+    reading= models.OneToOneField(Reading,null=True)
+    docfile = models.FileField(upload_to='readings')
+
+    def __unicode__(self):
+        return self.pk
+
+
+
+
+class AssignmentDocument(models.Model):
+    assignment = models.OneToOneField(Assignment,null=True)
+    docfile = models.FileField(upload_to='assignments')
 
 

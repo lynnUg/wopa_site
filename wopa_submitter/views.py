@@ -1,19 +1,20 @@
 from braces.views import LoginRequiredMixin
 from django.shortcuts import render
 from django.views.generic import TemplateView
-from wopa_submitter.forms import UserForm, DocumentForm, AssignmentForm, StuAssignmentForm
+from wopa_submitter.forms import UserForm, AssignmentForm,AssignmentDocumentForm,SubmissionDocumentForm
 from django.template import RequestContext
 from django.shortcuts import render_to_response
 from django.http import HttpResponseRedirect, HttpResponse
-from wopa_submitter.models import Document, Submission
+from wopa_submitter.models import  Submission, Assignment,AssignmentDocument,SubmissionDocument
 from django.core.urlresolvers import reverse
 from django.contrib.auth import logout, authenticate, login
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
-
+from django.shortcuts import render, get_object_or_404
+from filetransfers.api import serve_file
+import datetime
 
 def user_login(request):
-    # Like before, obtain the context for the user's request.
     context = RequestContext(request)
     account_diasbled = False
     invalid_account = False
@@ -39,7 +40,7 @@ def user_login(request):
             invalid_account = True
             # return HttpResponse("Invalid login details supplied.")
 
-    return render_to_response('wopa-submitter/login.html',
+    return render_to_response('wopa_submitter/login.html',
                               {'account_diasbled': account_diasbled, 'invalid_account': invalid_account,
                                'username': username, 'password': password}, context)
 
@@ -56,31 +57,10 @@ def index(request):
     # print "in index"
     context = RequestContext(request)
     assignmentsForUser = Submission.objects.filter(student=request.user)
-    return render_to_response('wopa-submitter/index.html', {'assignmentsForUser': assignmentsForUser}, context)
+    return render_to_response('wopa_submitter/index.html', {'assignmentsForUser': assignmentsForUser}, context)
 
 
-def list(request):
-    # Handle file upload
-    if request.method == 'POST':
-        form = DocumentForm(request.POST, request.FILES)
-        if form.is_valid():
-            newdoc = Document(docfile=request.FILES['docfile'])
-            newdoc.save()
 
-            # Redirect to the document list after POST
-            return HttpResponseRedirect(reverse('wopa_submitter.views.list'))
-    else:
-        form = DocumentForm()  # A empty, unbound form
-
-    # Load documents for the list page
-    documents = Document.objects.all()
-
-    # Render list page with the documents and the form
-    return render_to_response(
-        'wopa-submitter/list.html',
-        {'documents': documents, 'form': form},
-        context_instance=RequestContext(request)
-    )
 
 
 def register(request):
@@ -101,22 +81,23 @@ def register(request):
         user_form = UserForm()
 
     return render_to_response(
-        'wopa-submitter/login.html',
+        'wopa_submitter/login.html',
         {'user_form': user_form, 'user_errors': user_form.errors, 'registered': registered},
         context)
 
 
-def createAssignment(request):
-    # Like before, get the request's context.   
+def createAssignment(request):   
     context = RequestContext(request)
     created = False;
     if request.method == 'POST':
-        assignment_form = AssignmentForm(data=request.POST)
-
-        if assignment_form.is_valid():
+        assignment_form = AssignmentForm(request.POST)
+        assignment_document_form=AssignmentDocumentForm(request.POST,request.FILES)
+        if assignment_form.is_valid() & assignment_document_form.is_valid():
             assignment = assignment_form.save()
-            print "in create assignment"
             assignment.save()
+            newdoc =AssignmentDocument(docfile=request.FILES['docfile'],assignment=assignment)
+            newdoc.save()
+            #print AssignmentDocument.objects.all()
             if assignment.is_published == True:
                 users = User.objects.all()
                 for student in users:
@@ -127,36 +108,79 @@ def createAssignment(request):
             print assignment_form.errors
     else:
         assignment_form = AssignmentForm
+        assignment_document_form = AssignmentDocumentForm
 
+
+    return render_to_response('wopa_submitter/assignment.html',
+        {'assignment_form': assignment_form,'assignment_document_form': assignment_document_form, 'created': created},context)
+
+
+def detailAssignment(request,id):
+    context = RequestContext(request)
+    assignment=Assignment.objects.get(pk=id)
+    submission_document_form=SubmissionDocumentForm()
+    created=True
     return render_to_response(
-        'wopa-submitter/assignments/assignment.html',
-        {'assignment_form': assignment_form, 'created': created},
+        'wopa_submitter/assignment.html',
+        {'assignment': assignment,'submission_document_form':submission_document_form, 'created': created},
         context)
 
-
-def stuAssignment(request):
-    # Like before, get the request's context.
+def updateAssignment(request,id):
     context = RequestContext(request)
-    created = False
+    created=False
     if request.method == 'POST':
-        stuAssignment_form = StuAssignmentForm(data=request.POST)
+        assignment = get_object_or_404(Assignment, id=id)
+        assignment_doc = get_object_or_404(AssignmentDocument, assignment=assignment.pk)
+        assignment_form = AssignmentForm(request.POST,instance=assignment)
+        assignment_document_form=AssignmentDocumentForm(request.POST,request.FILES,instance=assignment_doc)
+        if assignment_form.is_valid() &assignment_document_form.is_valid():
+            assignment= assignment_form.save()
+            assignment_doc=assignment_document_form.save()
+            
+            created = True
+        else:
+            print assignment_form.errors
+    else:
+        assignment = get_object_or_404(Assignment, id=id)
+        print assignment.pk
+        assignment_form= AssignmentForm(request.POST or None, instance=assignment)
+        assignment_doc = get_object_or_404(AssignmentDocuments, assignment=assignment.pk)
+        assignment_document_form=AssignmentDocumentForm(request.POST or None,request.FILES or None,instance=assignment_doc)
+        
+    
+    return render_to_response('wopa_submitter/assignment.html',
+        {'assignment_form': assignment_form, 'assignment_document_form': assignment_document_form,'created': created,'redirectPage':'/updateassignment/'+id+'/'},
+        context)
 
-        if stuAssignment_form.is_valid():
-            stuAssignment = stuAssignment_form.save()
-            print "in create assignment"
-            stuAssignment.save()
-            created = True;
+def submitAssignment(request,id):
+    context = RequestContext(request)
+    created = False;
+    if request.method == 'POST':
+        submission_document_form=SubmissionDocumentForm(request.POST,request.FILES)
+        if submission_document_form.is_valid():
+            assignment=get_object_or_404(Assignment,pk=id)
+            submission=get_object_or_404(Submission,assignment=assignment.pk ,student=request.user.pk)
+            newdoc =SubmissionDocument(docfile=request.FILES['docfile'],submitter=request.user)
+            newdoc.save()
+            submission.submissions.add(newdoc)
+            submission.submitted=True
+            submission.date_submitted=datetime.datetime.now()
+            submission.save()
+            created=True
 
         else:
-            print stuAssignment_form.errors
+            print submission_document_form.errors
     else:
-        stuAssignment_form = StuAssignmentForm
+        submission_document_form=SubmissionDocumentForm()
+        #assignment_form = AssignmentForm
+    return render_to_response('wopa_submitter/assignment.html',
+        {'submission_document_form': submission_document_form,'created': created},context)
+def downloadSubmission(request, id):
 
-    return render_to_response(
-        'wopa-submitter/assignments/stuassign.html',
-        {'stuAssignment_form': stuAssignment_form, 'created': created},
-        context)
+    # get the object by id or raise a 404 error
+    object = get_object_or_404(SubmissionDocument, pk=id)
 
+    return serve_file(request, object.docfile,save_as=True)
 
 class Reading(TemplateView, LoginRequiredMixin):
     template_name = "wopa-submitter/readings/index.html"

@@ -1,6 +1,6 @@
 from django.contrib.auth.models import User
 from django import forms
-from wopa_submitter.models import Document, Assignment, Submission
+from wopa_submitter.models import Assignment, Submission,AssignmentDocument,SubmissionDocument
 
 
 class UserForm(forms.ModelForm):
@@ -14,14 +14,6 @@ class UserForm(forms.ModelForm):
         fields = ('first_name', 'last_name', 'username', 'email', 'password')
 
 
-class DocumentForm(forms.ModelForm):
-    docfile = forms.FileField(
-        label='Select a file',
-        help_text='max. 42 megabytes'
-    )
-
-    class Meta:
-        model = Document
 
 
 class AssignmentForm(forms.ModelForm):
@@ -30,10 +22,23 @@ class AssignmentForm(forms.ModelForm):
 
     class Meta:
         model = Assignment
-        fields = ('name', 'about', 'is_published')
+        fields = ('name', 'about', 'is_published','due_date')
 
-
-class StuAssignmentForm(forms.ModelForm):
+class AssignmentDocumentForm(forms.ModelForm):
+    docfile = forms.FileField(
+        label='Select a file',
+        help_text='max. 42 megabytes'
+    )
     class Meta:
-        model = Submission
-        fields = ('student', 'assignment')
+        model = AssignmentDocument
+        #fields = ('docfile')
+        exclude=('assignment')
+class SubmissionDocumentForm(forms.ModelForm):
+    docfile = forms.FileField(
+        label='Select a file',
+        help_text='max. 42 megabytes'
+    )
+    class Meta:
+        model = SubmissionDocument
+        #fields = ('docfile')
+        exclude=('submitter','filename')

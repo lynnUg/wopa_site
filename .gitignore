@@ -1,3 +1,6 @@
 ./idea
 ./idea/workspace.xml
 *.pyc
+/assignments
+/submissions
+*.sqlite3

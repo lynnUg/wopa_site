@@ -16,12 +16,13 @@ urlpatterns = patterns('',
 
                        url(r'^admin/', include(admin.site.urls)),
                        url(r'^register/$', views.register, name='register'),  # ADD NEW PATTERN!
-                       url(r'^createAssignment/$', views.createAssignment, name='createAssignment'),
-                       url(r'^assignments/$', views.Assignments.as_view(), name='assignments'),
-                       url(r'^stuAssignment/$', views.stuAssignment, name='stuAssignment'),
+                       url(r'^createAssignment/$', views.createAssignment, name='create'),
+                       url(r'^assignment/(\d+)/$', views.detailAssignment, name='download'),
+                       url(r'^updateassignment/(\d+)/$', views.updateAssignment, name='update'),
+                       url(r'^getSubmission/(\d+)/$', views.downloadSubmission, name='downloadSubmission'),  
                        url(r'^login/$', views.user_login, name='login'),
                        url(r'^logout/$', views.user_logout, name='logout'),
-                       url(r'^list/$', views.list, name='list'),
+                       url(r'^submit/(\d+)/$', views.submitAssignment, name='logout'),
                        url(r'^readings/$', views.Reading.as_view(), name='reading'),
                        url(r'^$', views.index, name='index'),
 
