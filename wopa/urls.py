@@ -24,6 +24,7 @@ urlpatterns = patterns('',
                        url(r'^logout/$', views.user_logout, name='logout'),
                        url(r'^submit/(\d+)/$', views.submitAssignment, name='logout'),
                        url(r'^readings/$', views.Reading.as_view(), name='reading'),
+                       url(r'^assignments/$', views.Assignments.as_view(), name='assignments'),
                        url(r'^$', views.index, name='index'),
 
 ) + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
