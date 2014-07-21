@@ -40,7 +40,7 @@ def user_login(request):
             invalid_account = True
             # return HttpResponse("Invalid login details supplied.")
 
-    return render_to_response('wopa_submitter/login.html',
+    return render_to_response('wopa_submitter/auth/index.html',
                               {'account_diasbled': account_diasbled, 'invalid_account': invalid_account,
                                'username': username, 'password': password}, context)
 
@@ -81,7 +81,7 @@ def register(request):
         user_form = UserForm()
 
     return render_to_response(
-        'wopa_submitter/login.html',
+        'wopa_submitter/auth/index.html',
         {'user_form': user_form, 'user_errors': user_form.errors, 'registered': registered},
         context)
 
@@ -121,7 +121,7 @@ def detailAssignment(request,id):
     submission_document_form=SubmissionDocumentForm()
     created=True
     return render_to_response(
-        'wopa_submitter/assignment.html',
+        'wopa_submitter/assignments/index.html',
         {'assignment': assignment,'submission_document_form':submission_document_form, 'created': created},
         context)
 
@@ -148,7 +148,7 @@ def updateAssignment(request,id):
         assignment_document_form=AssignmentDocumentForm(request.POST or None,request.FILES or None,instance=assignment_doc)
         
     
-    return render_to_response('wopa_submitter/assignment.html',
+    return render_to_response('wopa_submitter/assignments/index.html',
         {'assignment_form': assignment_form, 'assignment_document_form': assignment_document_form,'created': created,'redirectPage':'/updateassignment/'+id+'/'},
         context)
 
@@ -173,7 +173,7 @@ def submitAssignment(request,id):
     else:
         submission_document_form=SubmissionDocumentForm()
         #assignment_form = AssignmentForm
-    return render_to_response('wopa_submitter/assignment.html',
+    return render_to_response('wopa_submitter/assignments/index.html',
         {'submission_document_form': submission_document_form,'created': created},context)
 def downloadSubmission(request, id):
 
@@ -183,8 +183,8 @@ def downloadSubmission(request, id):
     return serve_file(request, object.docfile,save_as=True)
 
 class Reading(TemplateView, LoginRequiredMixin):
-    template_name = "wopa-submitter/readings/index.html"
+    template_name = "wopa_submitter/readings/index.html"
 
 
 class Assignments(TemplateView, LoginRequiredMixin):
-    template_name = "wopa-submitter/assignments/index.html"
+    template_name = "wopa_submitter/assignments/index.html"
