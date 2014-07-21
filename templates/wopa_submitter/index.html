@@ -32,7 +32,7 @@
           {% for assignment in assignmentsForUser%}
           <tr>
                 <td>
-          <a href="assignment/{{assignment.assignment.pk}}"><i class="glyphicon glyphicon-envelope"></i> Assignment{{assignment.assignment.pk}}</a>
+          <a href="{% url 'viewAssignment' 1 %}"><i class="glyphicon glyphicon-envelope"></i> Assignment{{assignment.assignment.pk}}</a>
            </td>
             <td>
           {{assignment.submitted}}
