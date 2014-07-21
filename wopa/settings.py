@@ -86,9 +86,11 @@ STATIC_URL = '/static/'
 LOGIN_URL='/login/'
 #MEDIA_URL = '/media/'
 STATIC_ROOT = 'staticfiles'
-TEMPLATE_DIRS = (       
-                  os.path.join(BASE_DIR , 'templates'),
-                  os.path.join(BASE_DIR , 'templates/wopa-submitter'),
+TEMPLATE_DIRS = ( 
+'templates' ,     'templates/wopa_submitter','templates/wopa_submitter/auth',
+                  #os.path.join(BASE_DIR , 'templates'),
+                  #os.path.join(BASE_DIR , 'templates/wopa_submitter'),
+                  #os.path.join(BASE_DIR , 'templates/wopa_submitter/auth'),
 
 )
 STATIC_DIRS = (       
