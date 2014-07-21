@@ -10,7 +10,7 @@ https://docs.djangoproject.com/en/1.6/ref/settings/
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 import os
-BASE_DIR = os.path.dirname(os.path.dirname(__file__))
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
 
 # Quick-start development settings - unsuitable for production
@@ -85,7 +85,7 @@ USE_TZ = True
 STATIC_URL = '/static/'
 LOGIN_URL='/login/'
 #MEDIA_URL = '/media/'
-STATIC_ROOT = os.path.join(BASE_DIR, "static")
+STATIC_ROOT = 'staticfiles'
 TEMPLATE_DIRS = (       
                   os.path.join(BASE_DIR , 'templates'),
                   os.path.join(BASE_DIR , 'templates/wopa-submitter'),
@@ -95,4 +95,6 @@ STATIC_DIRS = (
                   os.path.join(BASE_DIR , 'static'),
 
 )
-print STATIC_ROOT
+import dj_database_url
+
+DATABASES['default'] =  dj_database_url.config(default='postgres://phozfwqshwpjkr:RfVh3kaQHGMklKNe3ZbUVycXba@ec2-50-17-207-54.compute-1.amazonaws.com:5432/d66le8a7l0rvp5')

@@ -4,3 +4,4 @@
 /assignments
 /submissions
 *.sqlite3
+staticfiles
