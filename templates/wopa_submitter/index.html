@@ -32,14 +32,15 @@
           {% for assignment in assignmentsForUser%}
           <tr>
                 <td>
-          <a href="{% url 'viewAssignment' 1 %}"><i class="glyphicon glyphicon-envelope"></i> Assignment{{assignment.assignment.pk}}</a>
+          <a href="{% url 'viewAssignment' assignment.assignment.pk %}"> Assignment {{assignment.assignment.pk}}</a>
            </td>
             <td>
           {{assignment.submitted}}
            </td>
             <td>
+               Max submissions is 10 ,you have {{assignment.submissions.count}}
               {% for test in assignment.submissions.all %}
-              <a href="getSubmission/{{test.pk}}" >{{test.docfile}}</a>
+              <a href="{% url 'downloadSubmission' test.pk %}" >{{test.docfile}}</a>
               {% endfor %}
            
            </td>

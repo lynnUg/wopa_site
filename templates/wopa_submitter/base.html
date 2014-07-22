@@ -11,7 +11,7 @@
     <!--[if lt IE 9]>
 			<script src="//html5shim.googlecode.com/svn/trunk/html5.js"></script>
 		<![endif]-->
-    <link href="static/css/styles.css" rel="stylesheet">
+    <link href="{% static 'css/styles.css' %}" rel="stylesheet">
 </head>
 <body>
 <!-- Header -->
@@ -30,7 +30,7 @@
 
                 <li class="dropdown">
                     <a class="dropdown-toggle" role="button" data-toggle="dropdown" href="#"><i
-                            class="glyphicon glyphicon-user"></i>{{ user.username }} <span class="caret"></span></a>
+                            class="glyphicon glyphicon-user"></i>{{ user.username }} </a>
 
                 </li>
                 <li><a href="/logout"><i class="glyphicon glyphicon-lock"></i> Logout</a></li>
@@ -45,8 +45,7 @@
     <div class="row">
         <div class="col-md-3">
             <!-- Left column -->
-            <a href="#"><strong><i class="glyphicon glyphicon-wrench"></i> Tools</strong></a>
-
+            
             <hr>
 
             <ul class="list-unstyled">
@@ -91,19 +90,10 @@
               console.log(data)
               if (data.localeCompare('You  have successfully registered') == 0) {
 
-                $.pnotify({
-                  title : 'User Registration',
-                  text : data + ". Thank you for signing up. Your account should be activated within the next 24-48 hours. You will recieve an email notification and be able to login once that is complete. ",
-
-                });
+                
 
               } else {
-                $("#simple-post").removeAttr('disabled');
-                $.pnotify({
-                  title : 'User Registration Problem',
-                  text : data,
-                  type : 'error'
-                });
+                
               }
             },
           });
@@ -111,6 +101,8 @@
         }
       
                
-    </script>
+</script>
+
+   
 </body>
 </html>

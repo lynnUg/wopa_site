@@ -2,20 +2,57 @@
  
 
 {% block content %}
+
         <h1>Assignment </h1>
 
        {% if created %}
-        <strong>thank you for creating an assignment!</strong>
-        <a href="/">Return to the homepage.</a><br />
+        <form id="assignment_form" method="post"  class="form-horizontal" role="form" >
+            <div class="form-group">
+            <label for="email" class="col-md-3 control-label">Assignment name</label>
+            <div class="col-md-6">
+            <input type="text" class="form-control"  value="{{assignment.name}}" required>
+            </div>
+            </div>
+            <div class="form-group">
+            <label  class="col-md-3 control-label">Assignment about</label>
+            <div class="col-md-6">
+            <input type="text" class="form-control"  value="{{assignment.about}}" required>
+            </div>
+            </div>
+            <div class="form-group">
+            <label  class="col-md-3 control-label">Assignment link</label>
+            <div class="col-md-6">
+            <a href="{% url 'downloadAssignment' assignment.id %}">Download Assignment {{assignment.pk}}</a>
+            </div>
+            </div>
+         </form>
 
-
-        {{assignment.about}}
-        <form id="user_form" method="post" action="/submit/{{assignment.pk}}/"
+         
+        <form id="user_form" method="post" class="form-horizontal"  action="/submit/{{assignment.pk}}/"
                 enctype="multipart/form-data">
+         {% if submission_document_form.errors %}
+         <div  id="login-alert" class="alert alert-danger col-sm-12"> Select file</div>
+        {% else %}  
+                                
+        {% endif %}
         {% csrf_token %}
-        {{submission_document_form.as_p}}
-        <input type="submit" name="submit" value="Submit" />
+        
+        <div class="form-group">
+            <label for="email" class="col-md-3 control-label">Select file:</label>
+            <div class="col-md-6">
+            <input id="id_docfile" name="docfile" type="file" /> 
+            </div>
+        </div>
+       <div class="form-group">
+                                    <!-- Button -->                                        
+        <div class="col-md-offset-8 col-md-9">
+        <button id="btn-signup" type="button" class="btn btn-info"><i class="icon-hand-right"></i> &nbsp Submit</button>
+                                        
+        </div>
+        </div>
+        
         </form>
+        
         {% else %}
 
         <form id="user_form" method="post" action="{{redirectPage}}"
@@ -30,7 +67,15 @@
             {{ assignment_document_form.as_p }}
 
             <!-- Provide a button to click to submit the form. -->
-            <input type="submit" name="submit" value="Register" />
+            <input type="submit" name="submit" value="Submit" />
         </form>
          {% endif %}
+         <script type="text/javascript">
+    var form = document.getElementById("user_form");
+
+document.getElementById("btn-signup").addEventListener("click", function () {
+            console.log(form)
+            form.submit();
+            });
+    </script>
 {% endblock %}
