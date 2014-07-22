@@ -1,7 +1,6 @@
 {% extends "wopa_submitter/base.html" %}
 
 {% block content %}
-
     {% for reading in readings %}
         <p>{{ reading.id }}. {{ reading.name }}</p>
         <p class="bg-info">{{ reading.message }}</p>
@@ -9,6 +8,5 @@
 
         <hr/>
     {% endfor %}
-
 
 {% endblock %}
