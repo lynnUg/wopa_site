@@ -13,9 +13,6 @@ class UserForm(forms.ModelForm):
         model = User
         fields = ('first_name', 'last_name', 'username', 'email', 'password')
 
-
-
-
 class AssignmentForm(forms.ModelForm):
     name = forms.CharField()
     about = forms.CharField(widget=forms.Textarea)

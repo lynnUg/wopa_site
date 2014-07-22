@@ -54,7 +54,6 @@ def user_logout(request):
 
 @login_required
 def index(request):
-    # print "in index"
     context = RequestContext(request)
     assignmentsForUser = Submission.objects.filter(student=request.user)
     return render_to_response('wopa_submitter/index.html', {'assignmentsForUser': assignmentsForUser}, context)
@@ -64,17 +63,25 @@ def index(request):
 
 
 def register(request):
-    # Like before, get the request's context.
     context = RequestContext(request)
     registered = False
     if request.method == 'POST':
         user_form = UserForm(data=request.POST)
-
-        if user_form.is_valid():
+        invitation_code=request.POST['code']
+        username = request.POST['username']
+        password = request.POST['password']
+        print invitation_code
+        if user_form.is_valid() & (invitation_code=='@wopa256'):
             user = user_form.save()
             user.set_password(user.password)
             user.save()
             registered = True
+            published_assignments=Assignment.objects.filter(is_published=True)
+            for assignment in published_assignments:
+                Submission.objects.create(student=user, assignment=assignment)
+            the_user = authenticate(username=username, password=password)
+            login(request, the_user)
+            return HttpResponseRedirect('/')
         else:
             print user_form.errors
     else:
@@ -85,6 +92,10 @@ def register(request):
         {'user_form': user_form, 'user_errors': user_form.errors, 'registered': registered},
         context)
 
+def assignAssignments(assignment):
+     users = User.objects.all()
+     for student in users:
+        Submission.objects.create(student=student, assignment=assignment)
 
 def createAssignment(request):   
     context = RequestContext(request)
@@ -99,9 +110,7 @@ def createAssignment(request):
             newdoc.save()
             #print AssignmentDocument.objects.all()
             if assignment.is_published == True:
-                users = User.objects.all()
-                for student in users:
-                    assigntoStu = Submission.objects.create(student=student, assignment=assignment)
+                assignAssignments(assignment)
             created = True;
 
         else:
@@ -137,14 +146,19 @@ def updateAssignment(request,id):
             assignment= assignment_form.save()
             assignment_doc=assignment_document_form.save()
             
-            created = True
+            if assignment_form.cleaned_data['is_published'] == True:
+                 submissions=Submission.objects.filter(assignment=assignment)
+                 if len(submissions)<=0:
+                    assignAssignments(assignment)
+            created=True
+
         else:
             print assignment_form.errors
     else:
         assignment = get_object_or_404(Assignment, id=id)
         print assignment.pk
         assignment_form= AssignmentForm(request.POST or None, instance=assignment)
-        assignment_doc = get_object_or_404(AssignmentDocuments, assignment=assignment.pk)
+        assignment_doc = get_object_or_404(AssignmentDocument, assignment=assignment.pk)
         assignment_document_form=AssignmentDocumentForm(request.POST or None,request.FILES or None,instance=assignment_doc)
         
     
@@ -154,19 +168,20 @@ def updateAssignment(request,id):
 
 def submitAssignment(request,id):
     context = RequestContext(request)
-    created = False;
+    created = True;
+    assignment=get_object_or_404(Assignment,pk=id)
     if request.method == 'POST':
         submission_document_form=SubmissionDocumentForm(request.POST,request.FILES)
         if submission_document_form.is_valid():
-            assignment=get_object_or_404(Assignment,pk=id)
             submission=get_object_or_404(Submission,assignment=assignment.pk ,student=request.user.pk)
             newdoc =SubmissionDocument(docfile=request.FILES['docfile'],submitter=request.user)
             newdoc.save()
-            submission.submissions.add(newdoc)
-            submission.submitted=True
-            submission.date_submitted=datetime.datetime.now()
-            submission.save()
-            created=True
+            if submission.submissions.count()<10:
+                submission.submissions.add(newdoc)
+                submission.submitted=True
+                submission.date_submitted=datetime.datetime.now()
+                submission.save()
+            return HttpResponseRedirect('/')
 
         else:
             print submission_document_form.errors
@@ -174,11 +189,17 @@ def submitAssignment(request,id):
         submission_document_form=SubmissionDocumentForm()
         #assignment_form = AssignmentForm
     return render_to_response('wopa_submitter/assignments/index.html',
-        {'submission_document_form': submission_document_form,'created': created},context)
+        {'submission_document_form': submission_document_form,'assignment': assignment,'created': created ,'submission_document_form.errors':submission_document_form.errors},context)
 def downloadSubmission(request, id):
 
     # get the object by id or raise a 404 error
     object = get_object_or_404(SubmissionDocument, pk=id)
+
+    return serve_file(request, object.docfile,save_as=True)
+def downloadAssignment(request, id):
+
+    # get the object by id or raise a 404 error
+    object = get_object_or_404(AssignmentDocument, pk=id)
 
     return serve_file(request, object.docfile,save_as=True)
 
