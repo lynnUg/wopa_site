@@ -7,3 +7,5 @@
 staticfiles
 media/
 media/*
+workspace.xml
+.idea/workspace.xml
