@@ -1,17 +1,11 @@
-import datetime
-
 from braces.views import LoginRequiredMixin
-from django.views.generic import TemplateView, ListView
-from django.template import RequestContext
-from django.shortcuts import render_to_response
-from django.http import HttpResponseRedirect
-from django.contrib.auth import logout, authenticate, login
+from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.models import User
-from django.shortcuts import get_object_or_404
-
-from wopa_submitter.forms import UserForm, AssignmentForm
-from wopa_submitter.models import Submission, Reading, Assignment
+from django.http import HttpResponseRedirect
+from django.shortcuts import render_to_response
+from django.template import RequestContext
+from django.views.generic import TemplateView, ListView
+from wopa_submitter.models import Reading, Assignment
 
 
 def user_login(request):

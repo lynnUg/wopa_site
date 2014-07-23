@@ -14,6 +14,7 @@ class Assignment(models.Model):
         return self.name
 
 
+
 class Feedback(models.Model):
     thefeedback = models.TextField()
     marker = models.ForeignKey(User)
@@ -37,9 +38,6 @@ class Reading(models.Model):
     message = models.TextField()
     document = models.FileField(upload_to="readings/%Y/%m/%d")
 
+
     def __unicode__(self):
         return self.name
-
-
-
-

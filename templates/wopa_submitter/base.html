@@ -81,31 +81,31 @@
 <script src="/static/js/bootstrap.min.js"></script>
 <script src="/static/js/scripts.js"></script>
 <script>
-   
+
           function performDownload(pk){
             console.log(pk)
             $.ajax({
             url : "/getSubmission/"+pk+"/",
-            
+
             success : function(response) {
               data = String(response);
               console.log(data)
               if (data.localeCompare('You  have successfully registered') == 0) {
 
-                
+
 
               } else {
-                
+
               }
             },
           });
-                
+
         }
-      
-               
+
+
 </script>
 
-   
+
 >>>>>>> updating templates and view
 </body>
 </html>
