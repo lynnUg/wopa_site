@@ -6,7 +6,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
     }
-}
+wopa_submitter/views.py}
 
 STATIC_URL = '/static/'
 STATIC_ROOT = 'staticfiles'

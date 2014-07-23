@@ -8,10 +8,7 @@ dj-database-url==0.2.2
 dj-static==0.0.5
 django-braces==1.4.0
 django-nose==1.2
-<<<<<<< HEAD
 django-storages==1.1.8
-=======
->>>>>>> changed settings and changed models back to file fields and updated requirements.txt
 docutils==0.12
 gunicorn==18.0
 mock==1.0.1

@@ -10,11 +10,7 @@
     <!--[if lt IE 9]>
 			<script src="//html5shim.googlecode.com/svn/trunk/html5.js"></script>
 		<![endif]-->
-<<<<<<< HEAD
     <link href="{{ STATIC_URL }}css/styles.css" rel="stylesheet">
-=======
-    <link href="{% static 'css/styles.css' %}" rel="stylesheet">
->>>>>>> updating templates and view
 </head>
 <body>
 <!-- Header -->
@@ -33,11 +29,7 @@
 
                 <li class="dropdown">
                     <a class="dropdown-toggle" role="button" data-toggle="dropdown" href="#"><i
-<<<<<<< HEAD
                             class="glyphicon glyphicon-user"></i> <span class="caret"></span></a>
-=======
-                            class="glyphicon glyphicon-user"></i>{{ user.username }} </a>
->>>>>>> updating templates and view
 
                 </li>
                 <li><a href="/logout"><i class="glyphicon glyphicon-lock"></i> Logout</a></li>
@@ -71,41 +63,9 @@
     </div>
 </div>
 
-<<<<<<< HEAD
 <script src="{{ STATIC_URL }}js/jquery-2.1.1.min.js"></script>
 <script src="{{ STATIC_URL }}js/bootstrap.min.js"></script>
 <script src="{{ STATIC_URL }}js/scripts.js"></script>
 
-=======
-<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.2/jquery.min.js"></script>
-<script src="/static/js/bootstrap.min.js"></script>
-<script src="/static/js/scripts.js"></script>
-<script>
-
-          function performDownload(pk){
-            console.log(pk)
-            $.ajax({
-            url : "/getSubmission/"+pk+"/",
-
-            success : function(response) {
-              data = String(response);
-              console.log(data)
-              if (data.localeCompare('You  have successfully registered') == 0) {
-
-
-
-              } else {
-
-              }
-            },
-          });
-
-        }
-
-
-</script>
-
-
->>>>>>> updating templates and view
 </body>
 </html>
