@@ -5,3 +5,5 @@
 /submissions
 *.sqlite3
 staticfiles
+media/
+media/*

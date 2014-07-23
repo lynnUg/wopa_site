@@ -38,9 +38,7 @@
 
                 </td>
                 <td>
-                    {% for test in assignment.submissions.all %}
-                        <a href="getSubmission/{{ test.pk }}">{{ test.docfile }}</a>
-                    {% endfor %}
+                    <a href="{{ MEDIA_URL }}{{ assignment.file }}">Here</a>
 
                 </td>
                 <td>

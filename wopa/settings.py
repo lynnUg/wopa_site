@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/1.6/ref/settings/
 import os
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+PROJECT_PATH = os.path.join(os.path.dirname(__file__), '..')
 
 
 # Quick-start development settings - unsuitable for production
@@ -87,13 +88,15 @@ except:
     pass
 
 STATIC_URL = '/static/'
+STATIC_ROOT = 'staticfiles'
 LOGIN_URL = '/login/'
 MEDIA_URL = '/media/'
+MEDIA_ROOT = PROJECT_PATH + '/media/'
 TEMPLATE_DIRS = (
-    os.path.join(BASE_DIR, '../templates/'),
+    os.path.join(PROJECT_PATH, 'templates/'),
 
 )
-STATIC_DIRS = (
-    os.path.join(BASE_DIR, 'static'),
+STATICFILES_DIRS = (
+    os.path.join(PROJECT_PATH, 'static'),
 
 )

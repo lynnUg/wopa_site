@@ -20,4 +20,4 @@ urlpatterns = patterns('',
                        url(r'^assignments/$', views.AssignmentsView.as_view(), name='assignments-index'),
 
 
-) + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+) + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
