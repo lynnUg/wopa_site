@@ -1,36 +1,59 @@
-{% extends "base.html" %}
- 
+{% extends "wopa_submitter/base.html" %}
+
 
 {% block content %}
-        <h1>Assignment </h1>
+    <table id="example" class="table table-striped table-bordered table-condensed">
+        <thead>
+        <tr>
+            <th>
+                Assignment
+            </th>
+            <th>
+                Submission status
+            </th>
+            <th>
+                Submissions
+            </th>
+            <th>
+                Feedback
+            </th>
+            <th>
+                Submit Assignment
+            </th>
 
-       {% if created %}
-        <strong>thank you for creating an assignment!</strong>
-        <a href="/">Return to the homepage.</a><br />
+        </tr>
+        </thead>
+        <tbody>
+        {% for assignment in assignments %}
+            <tr>
+                <td>
+                    <a href="{{ assignment }}"><i class="glyphicon glyphicon-envelope"></i>
+                        {{ assignment.name }}</a>
+                </td>
+                <td>
+                    {% if assignment.submitted %}
+                          <p class="label label-success">Yes</p>
+                    {% endif %}
+                    <p class="label label-danger">No</p>
 
+                </td>
+                <td>
+                    {% for test in assignment.submissions.all %}
+                        <a href="getSubmission/{{ test.pk }}">{{ test.docfile }}</a>
+                    {% endfor %}
 
-        {{assignment.about}}
-        <form id="user_form" method="post" action="/submit/{{assignment.pk}}/"
-                enctype="multipart/form-data">
-        {% csrf_token %}
-        {{submission_document_form.as_p}}
-        <input type="submit" name="submit" value="Submit" />
-        </form>
-        {% else %}
-
-        <form id="user_form" method="post" action="{{redirectPage}}"
-                enctype="multipart/form-data">
-
-            {% csrf_token %}
-
-            <!-- Display each form. The as_p method wraps each element in a paragraph
-                 (<p>) element. This ensures each element appears on a new line,
-                 making everything look neater. -->
-            {{ assignment_form.as_p }}
-            {{ assignment_document_form.as_p }}
-
-            <!-- Provide a button to click to submit the form. -->
-            <input type="submit" name="submit" value="Register" />
-        </form>
-         {% endif %}
+                </td>
+                <td>
+                     {% if assignment.feedback %}
+                         <a href="#">View FeeBack</a>
+                    {% endif %}
+                    <p>No feedback given</p>
+                </td>
+                <td>
+                    <button class="btn btn-sm btn-primary">SUBMIT</button>
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
 {% endblock %}

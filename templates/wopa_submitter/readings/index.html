@@ -1,5 +1,14 @@
-{% extends "base.html" %}
+{% extends "wopa_submitter/base.html" %}
 
 {% block content %}
-   <p>Readings</p>
+
+    {% for reading in readings %}
+        <p>{{ reading.id }}. {{ reading.name }}</p>
+        <p class="bg-info">{{ reading.message }}</p>
+        <p>Download <a href="{{ MEDIA_URL }}{{ reading.document }}">Here</a></p>
+
+        <hr/>
+    {% endfor %}
+
+
 {% endblock %}

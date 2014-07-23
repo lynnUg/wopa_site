@@ -10,6 +10,9 @@ class Assignment(models.Model):
     due_date = models.DateField()
     file = models.FileField(upload_to="assignments/%Y/%m/%d")
 
+    def __unicode__(self):
+        return self.name
+
 
 class Feedback(models.Model):
     thefeedback = models.TextField()
@@ -33,6 +36,9 @@ class Reading(models.Model):
     name = models.CharField(max_length=250)
     message = models.TextField()
     document = models.FileField(upload_to="readings/%Y/%m/%d")
+
+    def __unicode__(self):
+        return self.name
 
 
 

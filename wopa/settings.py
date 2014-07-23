@@ -25,7 +25,7 @@ DEBUG = True
 
 TEMPLATE_DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -60,12 +60,8 @@ WSGI_APPLICATION = 'wopa.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.',
-        'NAME': '',
-        'USER': '',
-        'PASSWORD': '',
-        'HOST': '',
-        'PORT': '',
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
     }
 }
 # Internationalization
@@ -84,39 +80,20 @@ USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.6/howto/static-files/
-
+import dj_database_url
+try:
+    DATABASES = {'default': dj_database_url.config(default=os.environ['DATABASE_URL'])}
+except:
+    pass
 
 STATIC_URL = '/static/'
 LOGIN_URL = '/login/'
-# MEDIA_URL = '/media/'
-STATIC_ROOT = 'staticfiles'
+MEDIA_URL = '/media/'
 TEMPLATE_DIRS = (
-    'templates', 'templates/wopa_submitter', 'templates/wopa_submitter/auth',
-    #os.path.join(BASE_DIR , 'templates'),
-    #os.path.join(BASE_DIR , 'templates/wopa_submitter'),
-    #os.path.join(BASE_DIR , 'templates/wopa_submitter/auth'),
+    os.path.join(BASE_DIR, '../templates/'),
 
 )
 STATIC_DIRS = (
     os.path.join(BASE_DIR, 'static'),
 
-)
-import dj_database_url
-DATABASES['default'] = dj_database_url.config()
-
-# Honor the 'X-Forwarded-Proto' header for request.is_secure()
-SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
-
-# Allow all host headers
-ALLOWED_HOSTS = ['*']
-
-# Static asset configuration
-import os
-
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-STATIC_ROOT = 'staticfiles'
-STATIC_URL = '/static/'
-
-STATICFILES_DIRS = (
-    os.path.join(BASE_DIR, 'static'),
 )
