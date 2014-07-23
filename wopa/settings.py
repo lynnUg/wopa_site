@@ -78,20 +78,6 @@ USE_L10N = True
 
 USE_TZ = True
 
-STATIC_URL = '/static/'
-STATIC_ROOT = 'staticfiles'
-LOGIN_URL = '/login/'
-MEDIA_URL = '/media/'
-MEDIA_ROOT = PROJECT_PATH + '/media/'
-TEMPLATE_DIRS = (
-    os.path.join(PROJECT_PATH, 'templates/'),
-
-)
-STATICFILES_DIRS = (
-    os.path.join(PROJECT_PATH, 'static'),
-
-)
-
 import os
 
 AWS_ACCESS_KEY_ID = os.environ.get('AWS_ACCESS_KEY_ID')
