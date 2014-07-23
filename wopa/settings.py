@@ -38,8 +38,9 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    # 'south',
-    'wopa_submitter'
+    'storages',
+    'wopa_submitter',
+
 )
 
 MIDDLEWARE_CLASSES = (
@@ -78,15 +79,6 @@ USE_L10N = True
 
 USE_TZ = True
 
-
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/1.6/howto/static-files/
-import dj_database_url
-try:
-    DATABASES = {'default': dj_database_url.config(default=os.environ['DATABASE_URL'])}
-except:
-    pass
-
 STATIC_URL = '/static/'
 STATIC_ROOT = 'staticfiles'
 LOGIN_URL = '/login/'
@@ -100,3 +92,23 @@ STATICFILES_DIRS = (
     os.path.join(PROJECT_PATH, 'static'),
 
 )
+
+import os
+
+AWS_ACCESS_KEY_ID = os.environ.get('AWS_ACCESS_KEY_ID')
+AWS_SECRET_ACCESS_KEY = os.environ.get('AWS_SECRET_ACCESS_KEY')
+AWS_STORAGE_BUCKET_NAME = 'wopa-outbox'
+
+STATICFILES_STORAGE = 'storages.backends.s3boto.S3BotoStorage'
+DEFAULT_FILE_STORAGE = 'storages.backends.s3boto.S3BotoStorage'
+
+STATIC_URL = 'http://' + AWS_STORAGE_BUCKET_NAME + '.s3.amazonaws.com/'
+ADMIN_MEDIA_PREFIX = STATIC_URL + 'admin/'
+# Static files (CSS, JavaScript, Images)
+# https://docs.djangoproject.com/en/1.6/howto/static-files/
+import dj_database_url
+try:
+    DATABASES = {'default': dj_database_url.config(default=os.environ['DATABASE_URL'])}
+except:
+    pass
+
