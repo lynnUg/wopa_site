@@ -10,6 +10,7 @@ https://docs.djangoproject.com/en/1.6/ref/settings/
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 import os
+
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
 
@@ -36,7 +37,7 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    #'south',
+    # 'south',
     'wopa_submitter'
 )
 
@@ -59,11 +60,14 @@ WSGI_APPLICATION = 'wopa.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        'ENGINE': 'django.db.backends.',
+        'NAME': '',
+        'USER': '',
+        'PASSWORD': '',
+        'HOST': '',
+        'PORT': '',
     }
 }
-
 # Internationalization
 # https://docs.djangoproject.com/en/1.6/topics/i18n/
 
@@ -83,20 +87,36 @@ USE_TZ = True
 
 
 STATIC_URL = '/static/'
-LOGIN_URL='/login/'
-#MEDIA_URL = '/media/'
+LOGIN_URL = '/login/'
+# MEDIA_URL = '/media/'
 STATIC_ROOT = 'staticfiles'
-TEMPLATE_DIRS = ( 
-'templates' ,     'templates/wopa_submitter','templates/wopa_submitter/auth',
-                  #os.path.join(BASE_DIR , 'templates'),
-                  #os.path.join(BASE_DIR , 'templates/wopa_submitter'),
-                  #os.path.join(BASE_DIR , 'templates/wopa_submitter/auth'),
+TEMPLATE_DIRS = (
+    'templates', 'templates/wopa_submitter', 'templates/wopa_submitter/auth',
+    #os.path.join(BASE_DIR , 'templates'),
+    #os.path.join(BASE_DIR , 'templates/wopa_submitter'),
+    #os.path.join(BASE_DIR , 'templates/wopa_submitter/auth'),
 
 )
-STATIC_DIRS = (       
-                  os.path.join(BASE_DIR , 'static'),
+STATIC_DIRS = (
+    os.path.join(BASE_DIR, 'static'),
 
 )
 import dj_database_url
+DATABASES['default'] = dj_database_url.config()
 
-DATABASES['default'] =  dj_database_url.config(default='postgres://phozfwqshwpjkr:RfVh3kaQHGMklKNe3ZbUVycXba@ec2-50-17-207-54.compute-1.amazonaws.com:5432/d66le8a7l0rvp5')
+# Honor the 'X-Forwarded-Proto' header for request.is_secure()
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+
+# Allow all host headers
+ALLOWED_HOSTS = ['*']
+
+# Static asset configuration
+import os
+
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+STATIC_ROOT = 'staticfiles'
+STATIC_URL = '/static/'
+
+STATICFILES_DIRS = (
+    os.path.join(BASE_DIR, 'static'),
+)

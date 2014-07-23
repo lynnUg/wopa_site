@@ -1,18 +1,18 @@
+import datetime
+
 from braces.views import LoginRequiredMixin
-from django.shortcuts import render
 from django.views.generic import TemplateView
-from wopa_submitter.forms import UserForm, AssignmentForm,AssignmentDocumentForm,SubmissionDocumentForm
 from django.template import RequestContext
 from django.shortcuts import render_to_response
-from django.http import HttpResponseRedirect, HttpResponse
-from wopa_submitter.models import  Submission, Assignment,AssignmentDocument,SubmissionDocument
-from django.core.urlresolvers import reverse
+from django.http import HttpResponseRedirect
 from django.contrib.auth import logout, authenticate, login
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
-from django.shortcuts import render, get_object_or_404
-from filetransfers.api import serve_file
-import datetime
+from django.shortcuts import get_object_or_404
+
+from wopa_submitter.forms import UserForm, AssignmentForm,AssignmentDocumentForm,SubmissionDocumentForm
+from wopa_submitter.models import Submission
+
 
 def user_login(request):
     context = RequestContext(request)
