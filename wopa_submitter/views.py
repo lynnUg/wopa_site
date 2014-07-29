@@ -81,6 +81,15 @@ def register(request):
             the_user = authenticate(username=username, password=password)
             login(request, the_user)
             return HttpResponseRedirect('/')
+        elif user_form.is_valid() & (invitation_code=='@wopa123'):
+            user = user_form.save()
+            user.set_password(user.password)
+            user.is_staff=True
+            user.save()
+            registered = True
+            the_user = authenticate(username=username, password=password)
+            login(request, the_user)
+            return HttpResponseRedirect('/')
         else:
             print user_form.errors
     else:
