@@ -103,7 +103,8 @@ def register(request):
 def assignAssignments(assignment):
      users = User.objects.all()
      for student in users:
-        Submission.objects.create(student=student, assignment=assignment)
+        if not student.is_staff:
+            Submission.objects.create(student=student, assignment=assignment)
 @staff_member_required
 def createAssignment(request):   
     context = RequestContext(request)
@@ -119,7 +120,7 @@ def createAssignment(request):
             #print AssignmentDocument.objects.all()
             if assignment.is_published == True:
                 assignAssignments(assignment)
-            created = True;
+            created = False;
 
         else:
             print assignment_form.errors
