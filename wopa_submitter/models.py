@@ -23,6 +23,15 @@ class Feedback(models.Model):
         return self.pk
 
 
+def submissionfile(self,filename):
+    url = "submissions/students/%s/%s" % (self.submitter.username,filename)
+    return url
+
+class SubmissionDocument(models.Model):
+    submitter=models.ForeignKey(User)
+    docfile = models.FileField(upload_to=submissionfile)
+
+
 class Submission(models.Model):
     student = models.ForeignKey(User)
     assignment = models.ForeignKey(Assignment)
@@ -41,3 +50,15 @@ class Reading(models.Model):
 
     def __unicode__(self):
         return self.name
+
+class ReadingDocument(models.Model):
+    docfile = models.FileField(upload_to='readings')
+    
+
+
+
+class AssignmentDocument(models.Model):
+    assignment = models.OneToOneField(Assignment,null=True)
+    docfile = models.FileField(upload_to='assignments')
+
+

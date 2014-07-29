@@ -78,10 +78,11 @@ USE_L10N = True
 
 USE_TZ = True
 
+LOGIN_URL = '/login/'
 import os
 
-AWS_ACCESS_KEY_ID = 'AKIAIZVLQWPQFXQMTVKQ'
-AWS_SECRET_ACCESS_KEY = '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'
+AWS_ACCESS_KEY_ID = os.environ.get('AWS_ACCESS_KEY_ID')
+AWS_SECRET_ACCESS_KEY = os.environ.get('AWS_SECRET_ACCESS_KEY')
 AWS_STORAGE_BUCKET_NAME = 'wopa-outbox'
 
 STATICFILES_STORAGE = 'storages.backends.s3boto.S3BotoStorage'
