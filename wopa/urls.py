@@ -15,17 +15,14 @@ urlpatterns = patterns('',
                        # url(r'^blog/', include('blog.urls')),
 
                        url(r'^admin/', include(admin.site.urls)),
-                       url(r'^register/$', views.register, name='register'),  # ADD NEW PATTERN!
-                       url(r'^createassignment/$', views.createAssignment, name='create'),
-                       url(r'^assignment/(\d+)/$', views.detailAssignment, name='viewAssignment'),
-                       url(r'^updateassignment/(\d+)/$', views.updateAssignment, name='update'),
-                       url(r'^getsubmission/(\d+)/$', views.downloadSubmission, name='downloadSubmission'),  
-                       url(r'^getassignment/(\d+)/$', views.downloadAssignment, name='downloadAssignment'),  
+                       url(r'^$', views.Index.as_view(), name='index'),
+                       url(r'^readings/$', views.ReadingView.as_view(), name='readings'),
+                       url(r'^assignments/$', views.AssignmentsView.as_view(), name='assignments-index'),
                        url(r'^login/$', views.user_login, name='login'),
                        url(r'^logout/$', views.user_logout, name='logout'),
-                       url(r'^submit/(\d+)/$', views.submitAssignment, name='logout'),
-                       url(r'^readings/$', views.Reading.as_view(), name='reading'),
-                       url(r'^assignments/$', views.index, name='assignments'),
-                       url(r'^$', views.index, name='index'),
+                       url(r'^getsubmission/(\d+)/$', views.downloadSubmission, name='downloadSubmission'),  
+                        url(r'^getassignment/(\d+)/$', views.downloadAssignment, name='downloadAssignment'),  
 
-) + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+
+) 
+#+ static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

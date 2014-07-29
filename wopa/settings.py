@@ -10,7 +10,9 @@ https://docs.djangoproject.com/en/1.6/ref/settings/
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 import os
+
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+PROJECT_PATH = os.path.join(os.path.dirname(__file__), '..')
 
 
 # Quick-start development settings - unsuitable for production
@@ -24,7 +26,7 @@ DEBUG = True
 
 TEMPLATE_DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -36,8 +38,8 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    #'south',
-    'wopa_submitter'
+    'storages',
+    'wopa_submitter',
 )
 
 MIDDLEWARE_CLASSES = (
@@ -63,7 +65,6 @@ DATABASES = {
         'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
     }
 }
-
 # Internationalization
 # https://docs.djangoproject.com/en/1.6/topics/i18n/
 
@@ -77,26 +78,25 @@ USE_L10N = True
 
 USE_TZ = True
 
+import os
 
+AWS_ACCESS_KEY_ID = 'AKIAIZVLQWPQFXQMTVKQ'
+AWS_SECRET_ACCESS_KEY = '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'
+AWS_STORAGE_BUCKET_NAME = 'wopa-outbox'
+
+STATICFILES_STORAGE = 'storages.backends.s3boto.S3BotoStorage'
+DEFAULT_FILE_STORAGE = 'storages.backends.s3boto.S3BotoStorage'
+
+STATIC_URL = 'http://' + AWS_STORAGE_BUCKET_NAME + '.s3.amazonaws.com/'
+ADMIN_MEDIA_PREFIX = STATIC_URL + 'admin/'
+TEMPLATE_DIRS = (
+    os.path.join(PROJECT_PATH, 'templates/'),
+
+)
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.6/howto/static-files/
-
-
-STATIC_URL = '/static/'
-LOGIN_URL='/login/'
-#MEDIA_URL = '/media/'
-STATIC_ROOT = 'staticfiles'
-TEMPLATE_DIRS = ( 
-'templates' ,     'templates/wopa_submitter','templates/wopa_submitter/auth',
-                  #os.path.join(BASE_DIR , 'templates'),
-                  #os.path.join(BASE_DIR , 'templates/wopa_submitter'),
-                  #os.path.join(BASE_DIR , 'templates/wopa_submitter/auth'),
-
-)
-STATIC_DIRS = (       
-                  os.path.join(BASE_DIR , 'static'),
-
-)
 import dj_database_url
-
-DATABASES['default'] =  dj_database_url.config(default='postgres://phozfwqshwpjkr:RfVh3kaQHGMklKNe3ZbUVycXba@ec2-50-17-207-54.compute-1.amazonaws.com:5432/d66le8a7l0rvp5')
+try:
+    DATABASES = {'default': dj_database_url.config(default=os.environ['DATABASE_URL'])}
+except:
+    pass

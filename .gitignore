@@ -5,3 +5,7 @@
 /submissions
 *.sqlite3
 staticfiles
+media/
+media/*
+workspace.xml
+.idea/workspace.xml
