@@ -26,8 +26,7 @@ class AssignmentDocumentForm(forms.ModelForm):
   docfile = forms.FileField(label='Select a file',help_text='max. 42 megabytes')
   class Meta:
     model = AssignmentDocument
-    #fields = ('docfile')
-    exclude=('assignment')
+    exclude=('assignment',)
 class SubmissionDocumentForm(forms.ModelForm):
     docfile = forms.FileField(
            label='Select a file',
@@ -36,5 +35,5 @@ class SubmissionDocumentForm(forms.ModelForm):
     class Meta:
             model = SubmissionDocument
             exclude=('submitter','filename')
-            
+
  
