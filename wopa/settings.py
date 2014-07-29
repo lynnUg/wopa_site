@@ -40,6 +40,7 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
     'storages',
     'wopa_submitter',
+    'south',
 )
 
 MIDDLEWARE_CLASSES = (
@@ -79,6 +80,7 @@ USE_L10N = True
 USE_TZ = True
 
 LOGIN_URL = '/login/'
+
 import os
 
 AWS_ACCESS_KEY_ID = os.environ.get('AWS_ACCESS_KEY_ID')
