@@ -25,7 +25,8 @@ urlpatterns = patterns('',
                        url(r'^createassignment/$', views.createAssignment, name='create'),
                        url(r'^updateassignment/(\d+)/$', views.updateAssignment, name='update'),
                        url(r'^getassignment/(\d+)/$', views.downloadAssignment, name='downloadAssignment'),
-                      url(r'^assignment/(\d+)/$', views.detailAssignment, name='viewAssignment'),
+                       url(r'^assignment/(\d+)/$', views.detailAssignment, name='viewAssignment'),
+                       url(r'^register/$', views.register, name='register'), 
 
 
 ) 
