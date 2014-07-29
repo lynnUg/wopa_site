@@ -26,6 +26,7 @@ urlpatterns = patterns('',
                        url(r'^updateassignment/(\d+)/$', views.updateAssignment, name='update'),
                        url(r'^getassignment/(\d+)/$', views.downloadAssignment, name='downloadAssignment'),
                        url(r'^assignment/(\d+)/$', views.detailAssignment, name='viewAssignment'),
+                       url(r'^submit/(\d+)/$', views.submitAssignment, name='submit'),
                        url(r'^register/$', views.register, name='register'), 
 
 
