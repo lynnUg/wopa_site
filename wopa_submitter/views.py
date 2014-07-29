@@ -10,7 +10,7 @@ from django.contrib.auth.models import User
 from django.shortcuts import render, get_object_or_404
 from filetransfers.api import serve_file
 from django.contrib.admin.views.decorators import staff_member_required
-from wopa_submitter.forms import AssignmentForm,AssignmentDocumentForm,SubmissionDocumentForm
+from wopa_submitter.forms import AssignmentForm,AssignmentDocumentForm,SubmissionDocumentForm,UserForm
 import datetime
 
 def user_login(request):
