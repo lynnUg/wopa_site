@@ -8,26 +8,16 @@ from django.db import models
 class Migration(SchemaMigration):
 
     def forwards(self, orm):
-        # Deleting model 'SubmissionDocuments'
-        db.delete_table(u'wopa_submitter_submissiondocuments')
-
-        # Deleting model 'AssignmentDocuments'
-        db.delete_table(u'wopa_submitter_assignmentdocuments')
-
-        # Adding model 'AssignmentDocument'
-        db.create_table(u'wopa_submitter_assignmentdocument', (
+        # Adding model 'Submission'
+        db.create_table(u'wopa_submitter_submission', (
             (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('assignment', self.gf('django.db.models.fields.related.OneToOneField')(to=orm['wopa_submitter.Assignment'], unique=True, null=True)),
-            ('docfile', self.gf('django.db.models.fields.files.FileField')(max_length=100)),
+            ('student', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['auth.User'])),
+            ('assignment', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['wopa_submitter.Assignment'])),
+            ('feedback', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['wopa_submitter.Feedback'], null=True)),
+            ('submitted', self.gf('django.db.models.fields.BooleanField')(default=False)),
+            ('date_submitted', self.gf('django.db.models.fields.DateField')(null=True)),
         ))
-        db.send_create_signal(u'wopa_submitter', ['AssignmentDocument'])
-
-        # Adding model 'SubmissionDocument'
-        db.create_table(u'wopa_submitter_submissiondocument', (
-            (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('docfile', self.gf('django.db.models.fields.files.FileField')(max_length=100)),
-        ))
-        db.send_create_signal(u'wopa_submitter', ['SubmissionDocument'])
+        db.send_create_signal(u'wopa_submitter', ['Submission'])
 
         # Adding M2M table for field submissions on 'Submission'
         m2m_table_name = db.shorten_name(u'wopa_submitter_submission_submissions')
@@ -38,32 +28,38 @@ class Migration(SchemaMigration):
         ))
         db.create_unique(m2m_table_name, ['submission_id', 'submissiondocument_id'])
 
+        # Adding model 'AssignmentDocument'
+        db.create_table(u'wopa_submitter_assignmentdocument', (
+            (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
+            ('assignment', self.gf('django.db.models.fields.related.OneToOneField')(to=orm['wopa_submitter.Assignment'], unique=True, null=True)),
+            ('docfile', self.gf('django.db.models.fields.files.FileField')(max_length=100)),
+        ))
+        db.send_create_signal(u'wopa_submitter', ['AssignmentDocument'])
+
+        # Adding model 'Assignment'
+        db.create_table(u'wopa_submitter_assignment', (
+            (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
+            ('name', self.gf('django.db.models.fields.CharField')(max_length=128)),
+            ('about', self.gf('django.db.models.fields.TextField')()),
+            ('details', self.gf('django.db.models.fields.TextField')()),
+            ('is_published', self.gf('django.db.models.fields.BooleanField')(default=False)),
+            ('due_date', self.gf('django.db.models.fields.DateField')()),
+        ))
+        db.send_create_signal(u'wopa_submitter', ['Assignment'])
+
 
     def backwards(self, orm):
-        # Adding model 'SubmissionDocuments'
-        db.create_table(u'wopa_submitter_submissiondocuments', (
-            (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('submission', self.gf('django.db.models.fields.related.OneToOneField')(to=orm['wopa_submitter.Submission'], unique=True, null=True)),
-            ('docfile', self.gf('django.db.models.fields.files.FileField')(max_length=100)),
-        ))
-        db.send_create_signal(u'wopa_submitter', ['SubmissionDocuments'])
+        # Deleting model 'Submission'
+        db.delete_table(u'wopa_submitter_submission')
 
-        # Adding model 'AssignmentDocuments'
-        db.create_table(u'wopa_submitter_assignmentdocuments', (
-            ('assignment', self.gf('django.db.models.fields.related.OneToOneField')(to=orm['wopa_submitter.Assignment'], unique=True, null=True)),
-            (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('docfile', self.gf('django.db.models.fields.files.FileField')(max_length=100)),
-        ))
-        db.send_create_signal(u'wopa_submitter', ['AssignmentDocuments'])
+        # Removing M2M table for field submissions on 'Submission'
+        db.delete_table(db.shorten_name(u'wopa_submitter_submission_submissions'))
 
         # Deleting model 'AssignmentDocument'
         db.delete_table(u'wopa_submitter_assignmentdocument')
 
-        # Deleting model 'SubmissionDocument'
-        db.delete_table(u'wopa_submitter_submissiondocument')
-
-        # Removing M2M table for field submissions on 'Submission'
-        db.delete_table(db.shorten_name(u'wopa_submitter_submission_submissions'))
+        # Deleting model 'Assignment'
+        db.delete_table(u'wopa_submitter_assignment')
 
 
     models = {
@@ -149,7 +145,8 @@ class Migration(SchemaMigration):
         u'wopa_submitter.submissiondocument': {
             'Meta': {'object_name': 'SubmissionDocument'},
             'docfile': ('django.db.models.fields.files.FileField', [], {'max_length': '100'}),
-            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'})
+            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'submitter': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['auth.User']"})
         }
     }
 

@@ -5,7 +5,7 @@ from django.http import HttpResponseRedirect
 from django.shortcuts import render_to_response
 from django.template import RequestContext
 from django.views.generic import TemplateView, ListView
-from wopa_submitter.models import Reading, Assignment,Submission,AssignmentDocument
+from wopa_submitter.models import Reading, Assignment,Submission,AssignmentDocument,SubmissionDocument
 from django.contrib.auth.models import User
 from django.shortcuts import render, get_object_or_404
 from filetransfers.api import serve_file

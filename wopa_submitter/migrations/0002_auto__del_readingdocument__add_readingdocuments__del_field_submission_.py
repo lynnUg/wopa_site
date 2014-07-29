@@ -8,80 +8,73 @@ from django.db import models
 class Migration(SchemaMigration):
 
     def forwards(self, orm):
-        # Deleting model 'Document'
-        db.delete_table(u'wopa_submitter_document')
+        # Deleting model 'ReadingDocument'
+        db.delete_table(u'wopa_submitter_readingdocument')
 
         # Adding model 'ReadingDocuments'
         db.create_table(u'wopa_submitter_readingdocuments', (
             (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
+            ('reading', self.gf('django.db.models.fields.related.OneToOneField')(to=orm['wopa_submitter.Reading'], unique=True, null=True)),
             ('docfile', self.gf('django.db.models.fields.files.FileField')(max_length=100)),
         ))
         db.send_create_signal(u'wopa_submitter', ['ReadingDocuments'])
 
-        # Adding model 'SubmissionDocuments'
-        db.create_table(u'wopa_submitter_submissiondocuments', (
-            (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('docfile', self.gf('django.db.models.fields.files.FileField')(max_length=100)),
+        # Deleting field 'Submission.file'
+        db.delete_column(u'wopa_submitter_submission', 'file')
+
+        # Deleting field 'Submission.feeling_about_assignment'
+        db.delete_column(u'wopa_submitter_submission', 'feeling_about_assignment')
+
+        # Adding M2M table for field submissions on 'Submission'
+        m2m_table_name = db.shorten_name(u'wopa_submitter_submission_submissions')
+        db.create_table(m2m_table_name, (
+            ('id', models.AutoField(verbose_name='ID', primary_key=True, auto_created=True)),
+            ('submission', models.ForeignKey(orm[u'wopa_submitter.submission'], null=False)),
+            ('submissiondocument', models.ForeignKey(orm[u'wopa_submitter.submissiondocument'], null=False))
         ))
-        db.send_create_signal(u'wopa_submitter', ['SubmissionDocuments'])
+        db.create_unique(m2m_table_name, ['submission_id', 'submissiondocument_id'])
 
-        # Adding model 'AssignmentDocuments'
-        db.create_table(u'wopa_submitter_assignmentdocuments', (
-            (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('docfile', self.gf('django.db.models.fields.files.FileField')(max_length=100)),
-        ))
-        db.send_create_signal(u'wopa_submitter', ['AssignmentDocuments'])
+        # Deleting field 'Reading.document'
+        db.delete_column(u'wopa_submitter_reading', 'document')
 
-
-        # Renaming column for 'Reading.file' to match new field type.
-        db.rename_column(u'wopa_submitter_reading', 'file', 'file_id')
-        # Changing field 'Reading.file'
-        db.alter_column(u'wopa_submitter_reading', 'file_id', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['wopa_submitter.ReadingDocuments']))
-        # Adding index on 'Reading', fields ['file']
-        db.create_index(u'wopa_submitter_reading', ['file_id'])
-
-
-        # Renaming column for 'Assignment.assignment_file' to match new field type.
-        db.rename_column(u'wopa_submitter_assignment', 'assignment_file', 'assignment_file_id')
-        # Changing field 'Assignment.assignment_file'
-        db.alter_column(u'wopa_submitter_assignment', 'assignment_file_id', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['wopa_submitter.AssignmentDocuments']))
-        # Adding index on 'Assignment', fields ['assignment_file']
-        db.create_index(u'wopa_submitter_assignment', ['assignment_file_id'])
+        # Deleting field 'Assignment.file'
+        db.delete_column(u'wopa_submitter_assignment', 'file')
 
 
     def backwards(self, orm):
-        # Removing index on 'Assignment', fields ['assignment_file']
-        db.delete_index(u'wopa_submitter_assignment', ['assignment_file_id'])
-
-        # Removing index on 'Reading', fields ['file']
-        db.delete_index(u'wopa_submitter_reading', ['file_id'])
-
-        # Adding model 'Document'
-        db.create_table(u'wopa_submitter_document', (
+        # Adding model 'ReadingDocument'
+        db.create_table(u'wopa_submitter_readingdocument', (
             (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
             ('docfile', self.gf('django.db.models.fields.files.FileField')(max_length=100)),
         ))
-        db.send_create_signal(u'wopa_submitter', ['Document'])
+        db.send_create_signal(u'wopa_submitter', ['ReadingDocument'])
 
         # Deleting model 'ReadingDocuments'
         db.delete_table(u'wopa_submitter_readingdocuments')
 
-        # Deleting model 'SubmissionDocuments'
-        db.delete_table(u'wopa_submitter_submissiondocuments')
+        # Adding field 'Submission.file'
+        db.add_column(u'wopa_submitter_submission', 'file',
+                      self.gf('django.db.models.fields.files.FileField')(default='default value', max_length=100),
+                      keep_default=False)
 
-        # Deleting model 'AssignmentDocuments'
-        db.delete_table(u'wopa_submitter_assignmentdocuments')
+        # Adding field 'Submission.feeling_about_assignment'
+        db.add_column(u'wopa_submitter_submission', 'feeling_about_assignment',
+                      self.gf('django.db.models.fields.TextField')(default='default value'),
+                      keep_default=False)
 
+        # Removing M2M table for field submissions on 'Submission'
+        db.delete_table(db.shorten_name(u'wopa_submitter_submission_submissions'))
 
-        # Renaming column for 'Reading.file' to match new field type.
-        db.rename_column(u'wopa_submitter_reading', 'file_id', 'file')
-        # Changing field 'Reading.file'
-        db.alter_column(u'wopa_submitter_reading', 'file', self.gf('django.db.models.fields.files.FileField')(max_length=100))
+        # Adding field 'Reading.document'
+        db.add_column(u'wopa_submitter_reading', 'document',
+                      self.gf('django.db.models.fields.files.FileField')(default='default value', max_length=100),
+                      keep_default=False)
 
-        # Renaming column for 'Assignment.assignment_file' to match new field type.
-        db.rename_column(u'wopa_submitter_assignment', 'assignment_file_id', 'assignment_file')
-        # Changing field 'Assignment.assignment_file'
-        db.alter_column(u'wopa_submitter_assignment', 'assignment_file', self.gf('django.db.models.fields.files.FileField')(max_length=100))
+        # Adding field 'Assignment.file'
+        db.add_column(u'wopa_submitter_assignment', 'file',
+                      self.gf('django.db.models.fields.files.FileField')(default='default value', max_length=100),
+                      keep_default=False)
+
 
     models = {
         u'auth.group': {
@@ -123,15 +116,15 @@ class Migration(SchemaMigration):
         u'wopa_submitter.assignment': {
             'Meta': {'object_name': 'Assignment'},
             'about': ('django.db.models.fields.TextField', [], {}),
-            'assignment_file': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['wopa_submitter.AssignmentDocuments']"}),
             'details': ('django.db.models.fields.TextField', [], {}),
             'due_date': ('django.db.models.fields.DateField', [], {}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'is_published': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
             'name': ('django.db.models.fields.CharField', [], {'max_length': '128'})
         },
-        u'wopa_submitter.assignmentdocuments': {
-            'Meta': {'object_name': 'AssignmentDocuments'},
+        u'wopa_submitter.assignmentdocument': {
+            'Meta': {'object_name': 'AssignmentDocument'},
+            'assignment': ('django.db.models.fields.related.OneToOneField', [], {'to': u"orm['wopa_submitter.Assignment']", 'unique': 'True', 'null': 'True'}),
             'docfile': ('django.db.models.fields.files.FileField', [], {'max_length': '100'}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'})
         },
@@ -143,7 +136,6 @@ class Migration(SchemaMigration):
         },
         u'wopa_submitter.reading': {
             'Meta': {'object_name': 'Reading'},
-            'file': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['wopa_submitter.ReadingDocuments']"}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'message': ('django.db.models.fields.TextField', [], {}),
             'name': ('django.db.models.fields.CharField', [], {'max_length': '250'})
@@ -151,22 +143,24 @@ class Migration(SchemaMigration):
         u'wopa_submitter.readingdocuments': {
             'Meta': {'object_name': 'ReadingDocuments'},
             'docfile': ('django.db.models.fields.files.FileField', [], {'max_length': '100'}),
-            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'})
+            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'reading': ('django.db.models.fields.related.OneToOneField', [], {'to': u"orm['wopa_submitter.Reading']", 'unique': 'True', 'null': 'True'})
         },
         u'wopa_submitter.submission': {
             'Meta': {'object_name': 'Submission'},
             'assignment': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['wopa_submitter.Assignment']"}),
             'date_submitted': ('django.db.models.fields.DateField', [], {'null': 'True'}),
-            'documents': ('django.db.models.fields.related.ManyToManyField', [], {'to': u"orm['wopa_submitter.SubmissionDocuments']", 'null': 'True', 'symmetrical': 'False'}),
             'feedback': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['wopa_submitter.Feedback']", 'null': 'True'}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'student': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['auth.User']"}),
+            'submissions': ('django.db.models.fields.related.ManyToManyField', [], {'to': u"orm['wopa_submitter.SubmissionDocument']", 'null': 'True', 'symmetrical': 'False'}),
             'submitted': ('django.db.models.fields.BooleanField', [], {'default': 'False'})
         },
-        u'wopa_submitter.submissiondocuments': {
-            'Meta': {'object_name': 'SubmissionDocuments'},
+        u'wopa_submitter.submissiondocument': {
+            'Meta': {'object_name': 'SubmissionDocument'},
             'docfile': ('django.db.models.fields.files.FileField', [], {'max_length': '100'}),
-            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'})
+            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'submitter': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['auth.User']"})
         }
     }
 
