@@ -15,19 +15,21 @@ urlpatterns = patterns('',
                        # url(r'^blog/', include('blog.urls')),
 
                        url(r'^admin/', include(admin.site.urls)),
-                       url(r'^$', views.index, name='assignments-index'),
-                       url(r'^readings/$', views.ReadingView.as_view(), name='readings'),
+                       url(r'^$', views.index, name='assignments'),
+                       
                        #url(r'^assignments/$', views.AssignmentsView.as_view(), name='assignments-index'),
                        url(r'^login/$', views.user_login, name='login'),
                        url(r'^logout/$', views.user_logout, name='logout'),
                        url(r'^getsubmission/(\d+)/$', views.downloadSubmission, name='downloadSubmission'),  
                        url(r'^getassignment/(\d+)/$', views.downloadAssignment, name='downloadAssignment'),  
-                       url(r'^createassignment/$', views.createAssignment, name='create'),
+                       url(r'^createassignment/$', views.createAssignment, name='createAssignment'),
                        url(r'^updateassignment/(\d+)/$', views.updateAssignment, name='update'),
-                       url(r'^getassignment/(\d+)/$', views.downloadAssignment, name='downloadAssignment'),
                        url(r'^assignment/(\d+)/$', views.detailAssignment, name='viewAssignment'),
                        url(r'^submit/(\d+)/$', views.submitAssignment, name='submit'),
                        url(r'^register/$', views.register, name='register'), 
+                       url(r'^createreading/$', views.createReading, name='createReading'),
+                       url(r'^readings/$', views.getReadings, name='readings'),
+                       url(r'^getreadings/(\d+)/$', views.downloadReading, name='downloadReading'),
 
 
 ) 

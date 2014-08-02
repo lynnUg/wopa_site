@@ -1,81 +1,59 @@
 {% extends "wopa_submitter/base.html" %}
-
 {% block content %}
+    <div class="col-md-9">
+        <a href="#"><strong><i class="glyphicon glyphicon-dashboard"></i> Assignments</strong></a>
+        <hr>
+        <table id="example" class="table table-striped table-bordered table-condensed">
+            <thead>
+            <tr>
+                <th>
+                    Assignment
+                </th>
+                <th>
+                    Submission status
+                </th>
+                <th>
+                    Submissions
+                </th>
+                <th>
+                    Date submitted
+                </th>
+                <th>
+                    Feedback
+                </th>
 
-        <h1>Assignment </h1>
+            
+        </tr>
+        </thead>
+        <tbody>
+          {% for assignment in assignmentsForUser%}
+          <tr>
+                <td>
+           <p>{{assignment.assignment.name}}</p>
+          <a href="{% url 'viewAssignment' assignment.assignment.pk %}"> View or Submit Assignment</a>
 
-       {% if created %}
-        <form id="assignment_form" method="post"  class="form-horizontal" role="form" >
-            <div class="form-group">
-            <label for="email" class="col-md-3 control-label">Assignment name</label>
-            <div class="col-md-6">
-            <input type="text" class="form-control"  value="{{assignment.name}}" required>
-            </div>
-            </div>
-            <div class="form-group">
-            <label  class="col-md-3 control-label">Assignment about</label>
-            <div class="col-md-6">
-            <input type="text" class="form-control"  value="{{assignment.about}}" required>
-            </div>
-            </div>
-            <div class="form-group">
-            <label  class="col-md-3 control-label">Assignment link</label>
-            <div class="col-md-6">
-            <a href="{% url 'downloadAssignment' assignment.id %}">Download Assignment {{assignment.pk}}</a>
-            </div>
-            </div>
-         </form>
+           </td>
+            <td>
+          {{assignment.submitted}}
+           </td>
+            <td>
+               Max submissions is 10 ,you have {{assignment.submissions.count}}
+              {% for test in assignment.submissions.all %}
+              <a href="{% url 'downloadSubmission' test.pk %}" >{{test.docfile}}</a>
+              {% endfor %}
+           
+           </td>
+            <td>
+          {{assignment.date_submitted}}
+           </td>
+           <td>
+          {{assignment.feedback}}
+           </td>
+         </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      
 
-         
-        <form id="user_form" method="post" class="form-horizontal"  action="/submit/{{assignment.pk}}/"
-                enctype="multipart/form-data">
-         {% if submission_document_form.errors %}
-         <div  id="login-alert" class="alert alert-danger col-sm-12"> Select file</div>
-        {% else %}  
-                                
-        {% endif %}
-        {% csrf_token %}
-        
-        <div class="form-group">
-            <label for="email" class="col-md-3 control-label">Select file:</label>
-            <div class="col-md-6">
-            <input id="id_docfile" name="docfile" type="file" /> 
-            </div>
-        </div>
-       <div class="form-group">
-                                    <!-- Button -->                                        
-        <div class="col-md-offset-8 col-md-9">
-        <button id="btn-signup" type="button" class="btn btn-info"><i class="icon-hand-right"></i> &nbsp Submit</button>
-                                        
-        </div>
-        </div>
-        
-        </form>
-        
-        {% else %}
-
-        <form id="user_form" method="post" action="{{redirectPage}}"
-                enctype="multipart/form-data">
-
-            {% csrf_token %}
-
-            <!-- Display each form. The as_p method wraps each element in a paragraph
-                 (<p>) element. This ensures each element appears on a new line,
-                 making everything look neater. -->
-            {{ assignment_form.as_p }}
-            {{ assignment_document_form.as_p }}
-
-            <!-- Provide a button to click to submit the form. -->
-            <input type="submit" name="submit" value="Submit" />
-        </form>
-         {% endif %}
-         <script type="text/javascript">
-    var form = document.getElementById("user_form");
-
-document.getElementById("btn-signup").addEventListener("click", function () {
-            console.log(form)
-            form.submit();
-            });
-    </script>
-
+    </div><!-- /col-md-9 -->
 {% endblock %}

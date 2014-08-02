@@ -29,7 +29,9 @@
           {% for assignment in assignmentsForUser%}
           <tr>
                 <td>
-          <a href="{% url 'viewAssignment' assignment.assignment.pk %}"> Assignment {{assignment.assignment.pk}}</a>
+           <p>{{assignment.assignment.name}}</p>
+          <a href="{% url 'viewAssignment' assignment.assignment.pk %}"> View or Submit Assignment</a>
+
            </td>
             <td>
           {{assignment.submitted}}

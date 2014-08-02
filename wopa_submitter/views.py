@@ -5,12 +5,12 @@ from django.http import HttpResponseRedirect
 from django.shortcuts import render_to_response
 from django.template import RequestContext
 from django.views.generic import TemplateView, ListView
-from wopa_submitter.models import Reading, Assignment,Submission,AssignmentDocument,SubmissionDocument
+from wopa_submitter.models import Reading, Assignment,Submission,AssignmentDocument,SubmissionDocument,ReadingDocuments
 from django.contrib.auth.models import User
 from django.shortcuts import render, get_object_or_404
 from filetransfers.api import serve_file
 from django.contrib.admin.views.decorators import staff_member_required
-from wopa_submitter.forms import AssignmentForm,AssignmentDocumentForm,SubmissionDocumentForm,UserForm
+from wopa_submitter.forms import AssignmentForm,AssignmentDocumentForm,SubmissionDocumentForm,UserForm,ReadingForm,ReadingDocumentForm
 import datetime
 
 def user_login(request):
@@ -55,7 +55,7 @@ def user_logout(request):
 def index(request):
     context = RequestContext(request)
     assignmentsForUser = Submission.objects.filter(student=request.user)
-    return render_to_response('wopa_submitter/index.html', {'assignmentsForUser': assignmentsForUser}, context)
+    return render_to_response('wopa_submitter/assignments/index.html', {'assignmentsForUser': assignmentsForUser}, context)
 
 
 
@@ -120,7 +120,7 @@ def createAssignment(request):
             #print AssignmentDocument.objects.all()
             if assignment.is_published == True:
                 assignAssignments(assignment)
-            created = False;
+            created = True;
 
         else:
             print assignment_form.errors
@@ -129,7 +129,7 @@ def createAssignment(request):
         assignment_document_form = AssignmentDocumentForm
 
 
-    return render_to_response('wopa_submitter/assignments/index.html',
+    return render_to_response('wopa_submitter/assignments/create.html',
         {'assignment_form': assignment_form,'assignment_document_form': assignment_document_form, 'created': created},context)
 
 
@@ -137,10 +137,9 @@ def detailAssignment(request,id):
     context = RequestContext(request)
     assignment=Assignment.objects.get(pk=id)
     submission_document_form=SubmissionDocumentForm()
-    created=True
     return render_to_response(
-        'wopa_submitter/assignments/index.html',
-        {'assignment': assignment,'submission_document_form':submission_document_form, 'created': created},
+        'wopa_submitter/assignments/detail.html',
+        {'assignment': assignment,'submission_document_form':submission_document_form},
         context)
 @staff_member_required
 def updateAssignment(request,id):
@@ -171,7 +170,7 @@ def updateAssignment(request,id):
         assignment_document_form=AssignmentDocumentForm(request.POST or None,request.FILES or None,instance=assignment_doc)
         
     
-    return render_to_response('wopa_submitter/assignments/index.html',
+    return render_to_response('wopa_submitter/assignments/create.html',
         {'assignment_form': assignment_form, 'assignment_document_form': assignment_document_form,'created': created,'redirectPage':'/updateassignment/'+id+'/'},
         context)
 @login_required
@@ -213,7 +212,46 @@ def downloadAssignment(request, id):
     object = get_object_or_404(AssignmentDocument, pk=id)
 
     return serve_file(request, object.docfile,save_as=True)
-class ReadingView(TemplateView, LoginRequiredMixin):
+@staff_member_required
+def createReading(request): 
+    context = RequestContext(request)
+    created = False;
+    if request.method == 'POST':
+        reading_form = ReadingForm(request.POST)
+        reading_document_form=ReadingDocumentForm(request.POST,request.FILES)
+        if reading_form.is_valid() & reading_document_form.is_valid():
+            newreading =ReadingDocuments(docfile=request.FILES['docfile'])
+            newreading.save()
+            reading = reading_form.save()
+            reading.reading=newreading
+            reading.save()
+            
+            #print AssignmentDocument.objects.all()
+            created = True;
+
+        else:
+            print assignment_form.errors
+    else:
+        reading_form = ReadingForm
+        reading_document_form = ReadingDocumentForm
+
+
+    return render_to_response('wopa_submitter/readings/create.html',
+        {'reading_form': reading_form,'reading_document_form': reading_document_form, 'created': created},context)  
+@login_required
+def getReadings(request):
+    context = RequestContext(request)
+    readings = Reading.objects.all()
+    return render_to_response('wopa_submitter/readings/index.html', {'readings': readings}, context)
+@login_required
+def downloadReading(request, id):
+
+    # get the object by id or raise a 404 error
+    object = get_object_or_404(ReadingDocuments, pk=id)
+
+    return serve_file(request, object.docfile,save_as=True)
+
+class ReadingView(ListView, LoginRequiredMixin):
     template_name = "wopa_submitter/readings/index.html"
     model = Reading
     context_object_name = 'readings'

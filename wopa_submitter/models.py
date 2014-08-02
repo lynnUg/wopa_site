@@ -39,21 +39,16 @@ class Submission(models.Model):
     date_submitted = models.DateField(null=True)
     submissions= models.ManyToManyField(SubmissionDocument,null=True)
 
-class Reading(models.Model):
-    name = models.CharField(max_length=250)
-    message = models.TextField()
-
-
-
 class ReadingDocuments(models.Model):
-    reading= models.OneToOneField(Reading,null=True)
     docfile = models.FileField(upload_to='readings')
 
     def __unicode__(self):
         return self.pk
 
-
-
+class Reading(models.Model):
+    name = models.CharField(max_length=250)
+    message = models.TextField()
+    reading=models.ForeignKey(ReadingDocuments,null=True)
 
 class AssignmentDocument(models.Model):
     assignment = models.OneToOneField(Assignment,null=True)

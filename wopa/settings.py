@@ -83,8 +83,7 @@ LOGIN_URL = '/login/'
 
 import os
 
-AWS_ACCESS_KEY_ID = os.environ.get('AWS_ACCESS_KEY_ID')
-AWS_SECRET_ACCESS_KEY = os.environ.get('AWS_SECRET_ACCESS_KEY')
+import local_settings
 AWS_STORAGE_BUCKET_NAME = 'wopa-outbox'
 
 STATICFILES_STORAGE = 'storages.backends.s3boto.S3BotoStorage'
@@ -101,5 +100,9 @@ TEMPLATE_DIRS = (
 import dj_database_url
 try:
     DATABASES = {'default': dj_database_url.config(default=os.environ['DATABASE_URL'])}
+    AWS_ACCESS_KEY_ID = os.environ.get('AWS_ACCESS_KEY_ID')
+    AWS_SECRET_ACCESS_KEY = os.environ.get('AWS_SECRET_ACCESS_KEY')
 except:
-    pass
+    DATABASES = {'default': dj_database_url.config(default=local_settings.DATABASE_URL)}
+    AWS_ACCESS_KEY_ID = local_settings.AWS_ACCESS_KEY_ID
+    AWS_SECRET_ACCESS_KEY = local_settings.AWS_SECRET_ACCESS_KEY
