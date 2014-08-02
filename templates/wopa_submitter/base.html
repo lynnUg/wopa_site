@@ -82,9 +82,15 @@
 </div>
 <script src="{{ STATIC_URL }}js/jquery-2.1.1.min.js"></script>
 <script src="{{ STATIC_URL }}js/bootstrap.min.js"></script>
-<script src="{{ STATIC_URL }}js/scripts.js"></script>
+<script src="http://code.jquery.com/jquery-1.11.1.min.js"></script>
+<script src="http://cdn.datatables.net/1.10.2/js/jquery.dataTables.min.js"></script>
+<script src="http://cdn.datatables.net/plug-ins/725b2a2115b/integration/bootstrap/3/dataTables.bootstrap.js"></script>
+
 
 <script>
+         $(document).ready(function() {
+    $('#example').dataTable();
+                   } );
    
           function performDownload(pk){
             console.log(pk)
