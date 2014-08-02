@@ -54,16 +54,17 @@ def user_logout(request):
 @login_required
 def index(request):
     context = RequestContext(request)
-    assignmentsForUser = Submission.objects.filter(student=request.user)
-    return render_to_response('wopa_submitter/assignments/index.html', {'assignmentsForUser': assignmentsForUser}, context)
-
-
-
+    if not request.user.is_staff:
+        assignmentsForUser = Submission.objects.filter(student=request.user)
+        return render_to_response('wopa_submitter/assignments/index.html', {'assignmentsForUser': assignmentsForUser}, context)
+    else:
+        return allAssignments(request)
 
 
 def register(request):
     context = RequestContext(request)
     registered = False
+    invitation_code_error=False
     if request.method == 'POST':
         user_form = UserForm(data=request.POST)
         invitation_code=request.POST['code']
@@ -91,13 +92,17 @@ def register(request):
             login(request, the_user)
             return HttpResponseRedirect('/')
         else:
+            if not((invitation_code=='@wopa123') or (invitation_code=='@wopa256')):
+                invitation_code_error=True
+
+
             print user_form.errors
     else:
         user_form = UserForm()
 
     return render_to_response(
         'wopa_submitter/auth/index.html',
-        {'user_form': user_form, 'user_errors': user_form.errors, 'registered': registered},
+        {'user_form': user_form, 'user_errors': user_form.errors, 'registered': registered,'invitation_code_error':invitation_code_error},
         context)
 
 def assignAssignments(assignment):
@@ -196,7 +201,7 @@ def submitAssignment(request,id):
     else:
         submission_document_form=SubmissionDocumentForm()
         #assignment_form = AssignmentForm
-    return render_to_response('wopa_submitter/assignments/index.html',
+    return render_to_response('wopa_submitter/assignments/detail.html',
         {'submission_document_form': submission_document_form,'assignment': assignment,'created': created ,'submission_document_form.errors':submission_document_form.errors},context)
 @login_required
 def downloadSubmission(request, id):
@@ -241,8 +246,12 @@ def createReading(request):
 @login_required
 def getReadings(request):
     context = RequestContext(request)
-    readings = Reading.objects.all()
-    return render_to_response('wopa_submitter/readings/index.html', {'readings': readings}, context)
+    if not request.user.is_staff:
+        readings = Reading.objects.all()
+        return render_to_response('wopa_submitter/readings/index.html', {'readings': readings}, context)
+    else:
+        readings = Reading.objects.all()
+        return render_to_response('wopa_submitter/readings/list.html', {'readings': readings}, context)
 @login_required
 def downloadReading(request, id):
 
@@ -250,6 +259,38 @@ def downloadReading(request, id):
     object = get_object_or_404(ReadingDocuments, pk=id)
 
     return serve_file(request, object.docfile,save_as=True)
+@staff_member_required
+def allAssignments(request):
+    context = RequestContext(request)
+    assignments= Assignment.objects.all()
+    return render_to_response('wopa_submitter/assignments/list.html', {'assignments': assignments}, context)
+@staff_member_required
+def updateReading(request,id):
+    context = RequestContext(request)
+    created=False
+    if request.method == 'POST':
+        reading = get_object_or_404(Reading, id=id)
+        reading_doc = get_object_or_404(ReadingDocuments, pk=reading.reading.pk)
+        reading_form = ReadingForm(request.POST,instance=reading)
+        reading_document_form=ReadingDocumentForm(request.POST,request.FILES,instance=reading_doc)
+        if reading_form.is_valid() &reading_document_form.is_valid():
+            reading= reading_form.save()
+            reading_doc=reading_document_form.save()
+            
+            created=True
+
+        else:
+            print reading_form.errors
+    else:
+        reading = get_object_or_404(Reading, id=id)
+        reading_form= ReadingForm(request.POST or None, instance=reading)
+        reading_doc = get_object_or_404(ReadingDocuments,  pk=reading.reading.pk)
+        reading_document_form=ReadingDocumentForm(request.POST or None,request.FILES or None,instance=reading_doc)
+
+    return render_to_response('wopa_submitter/readings/create.html',
+        {'reading_form': reading_form, 'reading_document_form': reading_document_form,'created': created,'redirectPage':'/updatereading/'+id+'/'},
+        context)
+        
 
 class ReadingView(ListView, LoginRequiredMixin):
     template_name = "wopa_submitter/readings/index.html"

@@ -47,8 +47,19 @@
 <div class="container">
     <div class="row">
         <div class="col-md-3">
+           {% if user.is_staff %}
+           <ul class="nav nav-pills nav-stacked" id="userMenu">
+                <li><a href="{% url 'readings' %}"><i class="glyphicon glyphicon-book"></i> Class
+                    Readings</a></li>
+                <li><a href="{% url 'allAssignments' %}"><i class="glyphicon glyphicon-envelope"></i>
+                    Assignments</a>
+                </li>
+                <li><a href="#"><i class="glyphicon glyphicon-exclamation-sign"></i> Rules</a>
+                </li>
 
-            <ul class="nav nav-pills nav-stacked" id="userMenu">
+            </ul>
+           {% else %}
+           <ul class="nav nav-pills nav-stacked" id="userMenu">
                 <li><a href="{% url 'readings' %}"><i class="glyphicon glyphicon-book"></i> Class
                     Readings</a></li>
                 <li><a href="{% url 'assignments' %}"><i class="glyphicon glyphicon-envelope"></i>
@@ -58,6 +69,8 @@
                 </li>
 
             </ul>
+           {% endif %}
+            
         </div>
         <!-- /col-3 -->
         <div class="col-md-9">

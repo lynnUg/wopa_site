@@ -88,9 +88,11 @@
 
                             <form id="user_form" method="post"  class="form-horizontal" role="form" action="/register/">
                                 {% csrf_token %}
-                                {% if user_errors %}
+                                
+                                {% if user_errors or invitation_code_error %}
                                 <div id="signupalert"  class="alert alert-danger">
                                     <p>Error:</p>
+                                      {% if user_errors %}
                                     {% for field in user_form %}
                                     <div class="fieldWrapper">
                                         {% if field.errors %}
@@ -101,6 +103,15 @@
                                          {% endif %}
                                     </div>
                                     {% endfor %}
+                                    {% else %}  
+                                    {% endif %}
+                                    {% if invitation_code_error %}
+                                       <div class="fieldWrapper">
+                                        <label >Invitation code</label>: <ul class="errorlist"><li>Wrong invitation code.</li></ul>
+
+                                     </div>
+                                    {% else %}  
+                                    {% endif %}
                                     <span></span>
                                 </div>
                                 {% else %}  

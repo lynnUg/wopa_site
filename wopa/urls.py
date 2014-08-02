@@ -23,13 +23,15 @@ urlpatterns = patterns('',
                        url(r'^getsubmission/(\d+)/$', views.downloadSubmission, name='downloadSubmission'),  
                        url(r'^getassignment/(\d+)/$', views.downloadAssignment, name='downloadAssignment'),  
                        url(r'^createassignment/$', views.createAssignment, name='createAssignment'),
-                       url(r'^updateassignment/(\d+)/$', views.updateAssignment, name='update'),
+                       url(r'^updateassignment/(\d+)/$', views.updateAssignment, name='updateAssignment'),
                        url(r'^assignment/(\d+)/$', views.detailAssignment, name='viewAssignment'),
+                       url(r'^allAssignments$', views.allAssignments, name='allAssignments'),
                        url(r'^submit/(\d+)/$', views.submitAssignment, name='submit'),
                        url(r'^register/$', views.register, name='register'), 
                        url(r'^createreading/$', views.createReading, name='createReading'),
                        url(r'^readings/$', views.getReadings, name='readings'),
                        url(r'^getreadings/(\d+)/$', views.downloadReading, name='downloadReading'),
+                       url(r'^updatereading/(\d+)/$', views.updateReading, name='updateReading'),
 
 
 ) 
