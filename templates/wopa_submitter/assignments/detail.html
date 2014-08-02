@@ -25,6 +25,7 @@
             </div>
             </div>
          </form>
+          <button id="btn-showform" type="button" class="btn btn-info"><i class="icon-hand-right"></i> &nbsp Click here to submit</button>
 
          
         <form id="user_form" method="post" class="form-horizontal"  action="/submit/{{assignment.pk}}/"
@@ -54,12 +55,29 @@
         
         
          <script type="text/javascript">
-    var form = document.getElementById("user_form");
+        $(document).ready(function(){
+        
+        
+        $("#user_form").hide();
+        function addListener()         
+            {
+              var form = document.getElementById("user_form");
 
-document.getElementById("btn-signup").addEventListener("click", function () {
-            console.log(form)
-            form.submit();
-            });
+              document.getElementById("btn-signup").addEventListener("click", function () {
+                    console.log(form)
+                    form.submit();
+                    });
+            }
+          document.getElementById("btn-showform").addEventListener("click", function () {
+                    
+                    $("#user_form").show();
+                    $("#btn-showform").hide();
+                    addListener();
+                    });
+         
+       
+       });
+   
     </script>
 
 {% endblock %}
