@@ -10,7 +10,7 @@ from django.contrib.auth.models import User
 from django.shortcuts import render, get_object_or_404
 from filetransfers.api import serve_file
 from django.contrib.admin.views.decorators import staff_member_required
-from wopa_submitter.forms import AssignmentForm,AssignmentDocumentForm,SubmissionDocumentForm,UserForm,ReadingForm,ReadingDocumentForm
+from wopa_submitter.forms import AssignmentForm,AssignmentDocumentForm,SubmissionDocumentForm,UserForm,ReadingForm,ReadingDocumentForm,SubmissionForm
 import datetime
 
 def user_login(request):
@@ -291,7 +291,36 @@ def updateReading(request,id):
         {'reading_form': reading_form, 'reading_document_form': reading_document_form,'created': created,'redirectPage':'/updatereading/'+id+'/'},
         context)
         
+@staff_member_required
+def forceSubmitAssignment(request):
+    context = RequestContext(request)
+    created = True;
+    #assignment=get_object_or_404(Assignment,pk=id)
+    submission=SubmissionForm()
+    submission_document_form=SubmissionDocumentForm()
+    if request.method == 'POST':
+        submission_document_form=SubmissionDocumentForm(request.POST,request.FILES)
+        if submission_document_form.is_valid():
+            print request.POST['assignment'], request.POST['student']
+            submission=get_object_or_404(Submission,assignment=request.POST['assignment'] ,student=request.POST['student'])
+            newdoc =SubmissionDocument(docfile=request.FILES['docfile'],submitter=request.user)
+            newdoc.save()
+            if submission.submissions.count()<10:
+                submission.submissions.add(newdoc)
+                submission.submitted=True
+                submission.date_submitted=datetime.datetime.now()
+                submission.save()
+            return HttpResponseRedirect('/forceSubmit/')
+        
 
+        else:
+            print submission_document_form.errors
+    else:
+        submission=SubmissionForm()
+        submission_document_form=SubmissionDocumentForm()
+        #assignment_form = AssignmentForm
+    return render_to_response('wopa_submitter/assignments/forceSubmit.html',
+        {'submission_document_form': submission_document_form,'form': submission,'created': created },context)
 class ReadingView(ListView, LoginRequiredMixin):
     template_name = "wopa_submitter/readings/index.html"
     model = Reading

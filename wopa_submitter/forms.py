@@ -1,7 +1,7 @@
 from django.contrib.auth.models import User
 from django import forms
 
-from wopa_submitter.models import Assignment ,AssignmentDocument,SubmissionDocument,ReadingDocuments,Reading
+from wopa_submitter.models import Assignment ,AssignmentDocument,SubmissionDocument,ReadingDocuments,Reading,Submission
 
 class UserForm(forms.ModelForm):
     password = forms.CharField(widget=forms.PasswordInput())
@@ -48,5 +48,9 @@ class ReadingDocumentForm(forms.ModelForm):
   docfile = forms.FileField(label='Select a file',help_text='')
   class Meta:
     model = ReadingDocuments
-
+class SubmissionForm(forms.ModelForm):
+     
+    class Meta:
+            model = Submission
+            exclude=('submissions','feedback','date_submitted','submitted')
  

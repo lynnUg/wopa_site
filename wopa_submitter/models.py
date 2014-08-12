@@ -9,6 +9,9 @@ class Assignment(models.Model):
     is_published = models.BooleanField(default=False)
     due_date = models.DateField()
 
+    def __unicode__(self):
+        return self.name
+
     
 
 

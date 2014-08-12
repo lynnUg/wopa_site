@@ -1,0 +1,52 @@
+{% extends "wopa_submitter/base.html" %}
+
+{% block content %}
+
+        <h1>Force submit Assignment </h1>
+
+       
+         
+
+         
+        <form id="user_form" method="post" class="form-horizontal"  
+                enctype="multipart/form-data" action="/forceSubmit/">
+                {{form.as_p}}
+                 {% csrf_token %}
+        
+            
+            
+            <input id="id_docfile" name="docfile" type="file" /> 
+           
+       
+       <div class="form-group">
+                                    <!-- Button -->                                        
+        <div class="col-md-offset-8 col-md-9">
+        <button id="btn-signup" type="button" class="btn btn-info"><i class="icon-hand-right"></i> &nbsp Submit</button>
+                                        
+        </div>
+        </div>
+        
+        </form>
+        
+        
+         <script type="text/javascript">
+        $(document).ready(function(){
+        
+        
+        
+              var form = document.getElementById("user_form");
+
+              document.getElementById("btn-signup").addEventListener("click", function () {
+                    //console.log(form)
+
+                    form.submit();
+                    });
+           
+          
+         
+       
+       });
+   
+    </script>
+
+{% endblock %}
