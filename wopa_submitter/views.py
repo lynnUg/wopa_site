@@ -13,6 +13,7 @@ from django.contrib.admin.views.decorators import staff_member_required
 from wopa_submitter.forms import AssignmentForm,AssignmentDocumentForm,SubmissionDocumentForm,UserForm,ReadingForm,ReadingDocumentForm,SubmissionForm
 from django.contrib.auth.models import User
 import datetime
+from django.utils import simplejson
 
 def user_login(request):
     context = RequestContext(request)
@@ -338,6 +339,20 @@ def statsStudents(request):
    
     return render_to_response('wopa_submitter/assignments/breakdown.html',
         {'the_users': the_users,'assignments': assignments,},context)
+@login_required
+def statsGraph(request):
+    context=RequestContext(request)
+    assignments= Assignment.objects.filter(is_published=True).order_by('name')
+    output=[]
+    for assignment in assignments:
+        assD={}
+        sub=Submission.objects.filter(assignment=assignment,submitted=True,student__is_staff=False)
+        assD["a"]=len(sub)
+        assD["y"]=assignment.name
+        output.append(assD)
+    entry = simplejson.dumps(output)
+    return render_to_response('wopa_submitter/assignments/graph.html',
+        {"entry":entry},context)
 
 class ReadingView(ListView, LoginRequiredMixin):
     template_name = "wopa_submitter/readings/index.html"
