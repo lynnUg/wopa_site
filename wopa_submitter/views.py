@@ -34,6 +34,7 @@ def user_login(request):
             else:
                 # return HttpResponse("Your WOPA account is disabled.")
                 account_diasbled = True
+                invalid_account = True
 
         else:
             print "Invalid login details: {0}, {1}".format(username, password)
@@ -325,15 +326,13 @@ def forceSubmitAssignment(request):
 @staff_member_required
 def statsStudents(request):
     context = RequestContext(request)
-    users= User.objects.filter(is_staff=False)
+    users= User.objects.filter(is_staff=False,is_active=True)
     assignments=[i.name for i in Assignment.objects.filter(is_published=True).order_by('name')]
     the_users=[]
     for user in users:
-        #the_users[user.first_name]=[]
         user_submission=[user.first_name]
         submissions=Submission.objects.filter(student=user).order_by('assignment')
         for submission in submissions:
-            #the_users[user.first_name].append(submission.submitted)
             user_submission.append(submission.submitted)
         the_users.append(user_submission)
    
