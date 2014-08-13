@@ -11,6 +11,7 @@ from django.shortcuts import render, get_object_or_404
 from filetransfers.api import serve_file
 from django.contrib.admin.views.decorators import staff_member_required
 from wopa_submitter.forms import AssignmentForm,AssignmentDocumentForm,SubmissionDocumentForm,UserForm,ReadingForm,ReadingDocumentForm,SubmissionForm
+from django.contrib.auth.models import User
 import datetime
 
 def user_login(request):
@@ -321,6 +322,24 @@ def forceSubmitAssignment(request):
         #assignment_form = AssignmentForm
     return render_to_response('wopa_submitter/assignments/forceSubmit.html',
         {'submission_document_form': submission_document_form,'form': submission,'created': created },context)
+@staff_member_required
+def statsStudents(request):
+    context = RequestContext(request)
+    users= User.objects.filter(is_staff=False)
+    assignments=[i.name for i in Assignment.objects.filter(is_published=True).order_by('name')]
+    the_users=[]
+    for user in users:
+        #the_users[user.first_name]=[]
+        user_submission=[user.first_name]
+        submissions=Submission.objects.filter(student=user).order_by('assignment')
+        for submission in submissions:
+            #the_users[user.first_name].append(submission.submitted)
+            user_submission.append(submission.submitted)
+        the_users.append(user_submission)
+   
+    return render_to_response('wopa_submitter/assignments/breakdown.html',
+        {'the_users': the_users,'assignments': assignments,},context)
+
 class ReadingView(ListView, LoginRequiredMixin):
     template_name = "wopa_submitter/readings/index.html"
     model = Reading

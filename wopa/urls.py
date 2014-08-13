@@ -33,6 +33,7 @@ urlpatterns = patterns('',
                        url(r'^getreadings/(\d+)/$', views.downloadReading, name='downloadReading'),
                        url(r'^updatereading/(\d+)/$', views.updateReading, name='updateReading'),
                       url(r'^forceSubmit/$', views.forceSubmitAssignment, name='forceSubmitAssignment'),
+                      url(r'^stats/$', views.statsStudents, name='stats'),
 
 
 ) 
