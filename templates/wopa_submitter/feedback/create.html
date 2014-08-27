@@ -1,0 +1,21 @@
+{% extends "wopa_submitter/base.html" %}
+
+{% block content %}
+  
+         
+         <p>{{submission.student.first_name}}</p>
+         <p>{{submission.assignment.name}}</p>
+         {% for test in submission.submissions.all %}
+              <a href="{% url 'downloadSubmission' test.pk %}" >{{test.docfile}}</a>
+          {% endfor %}
+          <h1>Feedback </h1>
+        <form id="user_form" method="post" >
+               {% csrf_token %}    
+            {{ feedback_form.as_p }}
+            
+
+            <!-- Provide a button to click to submit the form. -->
+            <input type="submit" name="submit" value="Submit" />
+        </form>
+  
+{% endblock %}

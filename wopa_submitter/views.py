@@ -5,15 +5,16 @@ from django.http import HttpResponseRedirect
 from django.shortcuts import render_to_response
 from django.template import RequestContext
 from django.views.generic import TemplateView, ListView
-from wopa_submitter.models import Reading, Assignment,Submission,AssignmentDocument,SubmissionDocument,ReadingDocuments
+from wopa_submitter.models import Reading, Assignment,Submission,AssignmentDocument,SubmissionDocument,ReadingDocuments,Feedback
 from django.contrib.auth.models import User
 from django.shortcuts import render, get_object_or_404
 from filetransfers.api import serve_file
 from django.contrib.admin.views.decorators import staff_member_required
-from wopa_submitter.forms import AssignmentForm,AssignmentDocumentForm,SubmissionDocumentForm,UserForm,ReadingForm,ReadingDocumentForm,SubmissionForm
+from wopa_submitter.forms import AssignmentForm,AssignmentDocumentForm,SubmissionDocumentForm,UserForm,ReadingForm,ReadingDocumentForm,SubmissionForm,FeedbackForm
 from django.contrib.auth.models import User
 import datetime
 from django.utils import simplejson
+from django.core.mail import send_mail
 
 def user_login(request):
     context = RequestContext(request)
@@ -304,7 +305,7 @@ def forceSubmitAssignment(request):
     if request.method == 'POST':
         submission_document_form=SubmissionDocumentForm(request.POST,request.FILES)
         if submission_document_form.is_valid():
-            print request.POST['assignment'], request.POST['student']
+            #print request.POST['assignment'], request.POST['student']
             submission=get_object_or_404(Submission,assignment=request.POST['assignment'] ,student=request.POST['student'])
             newdoc =SubmissionDocument(docfile=request.FILES['docfile'],submitter=request.user)
             newdoc.save()
@@ -353,6 +354,41 @@ def statsGraph(request):
     entry = simplejson.dumps(output)
     return render_to_response('wopa_submitter/assignments/graph.html',
         {"entry":entry},context)
+def giveFeedback(request):
+    context=RequestContext(request)
+    assignments=Assignment.objects.filter(is_published=True).order_by('name')
+    return render_to_response('wopa_submitter/feedback/assignmentlist.html',
+        {"assignments":assignments},context)
+    #pass
+def assignmentFeedback(request,assignment_id):
+    context=RequestContext(request)
+    subs=Submission.objects.filter(assignment=assignment_id,submitted=True,student__is_staff=False)
+    return render_to_response('wopa_submitter/feedback/submissionlist.html',
+        {"student_submissions":subs},context)
+def submitFeedback(request,student_id,assignment_id):
+    context=RequestContext(request)
+    subs=Submission.objects.filter(assignment=assignment_id,student=student_id,submitted=True,student__is_staff=False)
+    #print len(subs),"number of submission
+    submitted=""
+    if subs:
+        subs= subs[0]
+    else:
+        subs=None
+    if request.method == 'POST' and subs.feedback==None:
+        feedback_form=FeedbackForm(request.POST,request.FILES)
+        if feedback_form.is_valid():
+            feedback=feedback_form.save(commit=False)
+            feedback.marker=request.user
+            feedback.save()
+            subs.feedback=feedback
+            subs.save()
+            sendAssignmentEmail(subs.assignment.name,subs.student.email)
+            submitted="Feedback submitted"
+    feedback_form = FeedbackForm()
+    return render_to_response('wopa_submitter/feedback/create.html',
+        {"submission":subs,"feedback_form":feedback_form,"submitted":submitted},context)
+def sendAssignmentEmail(assignment,email):
+    send_mail('Feedback on '+assignment, 'Hi Please visit the wopa website for feedback on '+assignment+" Please visit 'http://wopaoutbox.herokuapp.com/' to view feedback", 'lynnasiimwe@gmail.com', [email], fail_silently=False)
 
 class ReadingView(ListView, LoginRequiredMixin):
     template_name = "wopa_submitter/readings/index.html"

@@ -81,6 +81,12 @@ USE_TZ = True
 
 LOGIN_URL = '/login/'
 
+EMAIL_HOST = 'smtp.sendgrid.net'
+EMAIL_HOST_USER = 'lynnug'
+EMAIL_HOST_PASSWORD = 'asiimwe18!'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+
 import os
 
 import local_settings
@@ -88,6 +94,8 @@ AWS_STORAGE_BUCKET_NAME = 'wopa-outbox'
 
 STATICFILES_STORAGE = 'storages.backends.s3boto.S3BotoStorage'
 DEFAULT_FILE_STORAGE = 'storages.backends.s3boto.S3BotoStorage'
+AWS_ACCESS_KEY_ID = local_settings.AWS_ACCESS_KEY_ID 
+AWS_SECRET_ACCESS_KEY = local_settings.AWS_SECRET_ACCESS_KEY
 
 STATIC_URL = 'http://' + AWS_STORAGE_BUCKET_NAME + '.s3.amazonaws.com/'
 ADMIN_MEDIA_PREFIX = STATIC_URL + 'admin/'
@@ -100,9 +108,6 @@ TEMPLATE_DIRS = (
 import dj_database_url
 try:
     DATABASES = {'default': dj_database_url.config(default=os.environ['DATABASE_URL'])}
-    AWS_ACCESS_KEY_ID = os.environ.get('AWS_ACCESS_KEY_ID')
-    AWS_SECRET_ACCESS_KEY = os.environ.get('AWS_SECRET_ACCESS_KEY')
 except:
     DATABASES = {'default': dj_database_url.config(default=local_settings.DATABASE_URL)}
-    AWS_ACCESS_KEY_ID = local_settings.AWS_ACCESS_KEY_ID
-    AWS_SECRET_ACCESS_KEY = local_settings.AWS_SECRET_ACCESS_KEY
+  

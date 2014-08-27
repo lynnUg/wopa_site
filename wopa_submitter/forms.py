@@ -1,7 +1,7 @@
 from django.contrib.auth.models import User
 from django import forms
 
-from wopa_submitter.models import Assignment ,AssignmentDocument,SubmissionDocument,ReadingDocuments,Reading,Submission
+from wopa_submitter.models import Assignment ,AssignmentDocument,SubmissionDocument,ReadingDocuments,Reading,Submission,Feedback
 
 class UserForm(forms.ModelForm):
     password = forms.CharField(widget=forms.PasswordInput())
@@ -53,4 +53,9 @@ class SubmissionForm(forms.ModelForm):
     class Meta:
             model = Submission
             exclude=('submissions','feedback','date_submitted','submitted')
+class FeedbackForm(forms.ModelForm):
+     
+    class Meta:
+            model = Feedback
+            exclude=('marker')
  
