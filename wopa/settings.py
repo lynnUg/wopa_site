@@ -41,6 +41,8 @@ INSTALLED_APPS = (
     'storages',
     'wopa_submitter',
     'south',
+    #'booking',
+    #'reservations',
 )
 
 MIDDLEWARE_CLASSES = (

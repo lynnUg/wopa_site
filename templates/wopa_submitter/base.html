@@ -62,13 +62,15 @@
                 <li><a href="{% url 'stats2'%}"><i class="glyphicon glyphicon-exclamation-sign"></i> Submission stats</a></li>
                 <li><a href="{% url 'giveFeedback'%}"><i class="glyphicon glyphicon-exclamation-sign"></i> Give Feedback</a>
                 </li>
-                <li><a href=""><i class="glyphicon glyphicon-exclamation-sign"></i> Rules</a>
+                <li><a href="{% url 'technicalInterview'%}"><i class="glyphicon glyphicon-exclamation-sign"></i> Technical Interview</a>
                 </li>
 
             </ul>
            {% else %}
              {% if user|has_group:"wopaTemp" %} 
-                <li><a href="/"> Welcome to WOPA Techincal Application</a></li>
+                <li> Welcome to WOPA Techincal Application</li>
+                 <li><a href="/"> Technical interview</a></li>
+                 <li><a href="booking"> Book slot for onsite interview</a></li>
               {% else %}
                  <li><a href="{% url 'readings' %}"><i class="glyphicon glyphicon-book"></i> Class
                     Readings</a></li>

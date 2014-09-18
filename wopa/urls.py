@@ -6,7 +6,7 @@ admin.autodiscover()
 
 from django.conf import settings
 from django.conf.urls.static import static
-
+from django.views.generic import TemplateView
 import wopa_submitter.views as views
 
 urlpatterns = patterns('',
@@ -38,6 +38,10 @@ urlpatterns = patterns('',
                        url(r'^submissions/(\d+)/$', views.assignmentFeedback, name='assignmentFeedback'),
                       url(r'^stats/$', views.statsStudents, name='stats'),
                       url(r'^statsGraph/$', views.statsGraph, name='stats2'),
+                      url(r'^technicalInterview/$', views.technicalInterview, name='technicalInterview'),
+                      #url(r'^booking/', include('booking.urls')),
+                       #url(r'^reservations/', include('reservations.urls')),
+                       (r'^booking/',TemplateView.as_view(template_name="wopa_submitter/wopainterviews/booking.html")),
 
 
 ) #+ static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

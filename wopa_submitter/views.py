@@ -15,7 +15,6 @@ from django.contrib.auth.models import User
 import datetime
 from django.utils import simplejson
 from django.core.mail import send_mail
-from django import template
 
 
 def user_login(request):
@@ -409,7 +408,19 @@ def submitFeedback(request,student_id,assignment_id):
 def sendAssignmentEmail(assignment,email):
     send_mail('Feedback on '+assignment, 'Hi Please visit the wopa website for feedback on '+assignment+" Please visit 'http://wopaoutbox.herokuapp.com/' to view feedback", 'lynnasiimwe@gmail.com', [email], fail_silently=False)
 
+@staff_member_required
+def technicalInterview(request):
+    context = RequestContext(request)
+    assignment= Assignment.objects.filter(name='Technical Test')
+    submissions=Submission.objects.filter(assignment=assignment)
+    #print len(submissions)
+    filter_submission=[]
+    for submission in submissions:
+        if not(submission.student.first_name.lower()=="lynn" and submission.student.last_name.lower()=="asiimwe"):
+            filter_submission.append(submission)
 
+
+    return render_to_response('wopa_submitter/wopainterviews/index.html', {'submissionsTechnical': filter_submission}, context)
 class ReadingView(ListView, LoginRequiredMixin):
     template_name = "wopa_submitter/readings/index.html"
     model = Reading
