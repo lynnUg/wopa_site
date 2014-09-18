@@ -1,7 +1,15 @@
 {% extends "wopa_submitter/base.html" %}
 {% block content %}
+{% load has_group %}
+
     <div class="col-md-9">
-        <a href="#"><strong><i class="glyphicon glyphicon-dashboard"></i> Assignments</strong></a>
+        <a href="#"><strong><i class="glyphicon glyphicon-dashboard"></i> 
+          {% if user|has_group:"wopaTemp" %} 
+               Technical Test
+              {% else %}
+              Assignments
+               {% endif %}
+          </strong></a>
         <hr>
         <table id="example" class="table table-striped table-bordered table-condensed">
             <thead>
@@ -37,7 +45,7 @@
           {{assignment.submitted}}
            </td>
             <td>
-               Max submissions is 10 ,you have {{assignment.submissions.count}}
+               Max submissions is 4 ,you have {{assignment.submissions.count}}
               {% for test in assignment.submissions.all %}
               <a href="{% url 'downloadSubmission' test.pk %}" >{{test.docfile}}</a>
               {% endfor %}

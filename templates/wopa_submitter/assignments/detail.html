@@ -15,7 +15,7 @@
             <div class="form-group">
             <label  class="col-md-3 control-label">Assignment about</label>
             <div class="col-md-6">
-            <input type="text" class="form-control"  value="{{assignment.about}}" required>
+            <textarea type="text" class="form-control"  rows="10" cols="10">{{assignment.about}}</textarea>
             </div>
             </div>
             <div class="form-group">
@@ -56,7 +56,19 @@
         
          <script type="text/javascript">
         $(document).ready(function(){
-        
+        var  valid=false
+         $('#id_docfile').bind('change', function() {
+                if (this.files[0].size/1024/1024 >0.11)
+                {
+                     alert('This file size is too big');
+                     valid=false
+                }
+                else
+                {
+                    valid=true
+                }
+               
+          });
         
         $("#user_form").hide();
         function addListener()         
@@ -64,8 +76,13 @@
               var form = document.getElementById("user_form");
 
               document.getElementById("btn-signup").addEventListener("click", function () {
+               
                     console.log(form)
-                    form.submit();
+                    if(valid)
+                    {
+                        form.submit();
+                    }
+                    
                     });
             }
           document.getElementById("btn-showform").addEventListener("click", function () {

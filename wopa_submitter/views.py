@@ -6,7 +6,7 @@ from django.shortcuts import render_to_response
 from django.template import RequestContext
 from django.views.generic import TemplateView, ListView
 from wopa_submitter.models import Reading, Assignment,Submission,AssignmentDocument,SubmissionDocument,ReadingDocuments,Feedback
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, Group
 from django.shortcuts import render, get_object_or_404
 from filetransfers.api import serve_file
 from django.contrib.admin.views.decorators import staff_member_required
@@ -15,6 +15,8 @@ from django.contrib.auth.models import User
 import datetime
 from django.utils import simplejson
 from django.core.mail import send_mail
+from django import template
+
 
 def user_login(request):
     context = RequestContext(request)
@@ -58,7 +60,11 @@ def user_logout(request):
 @login_required
 def index(request):
     context = RequestContext(request)
+    group = Group.objects.get(name='wopaTemp')
     if not request.user.is_staff:
+        assignmentsForUser = Submission.objects.filter(student=request.user)
+        return render_to_response('wopa_submitter/assignments/index.html', {'assignmentsForUser': assignmentsForUser}, context)
+    elif group in request.user.groups.all():
         assignmentsForUser = Submission.objects.filter(student=request.user)
         return render_to_response('wopa_submitter/assignments/index.html', {'assignmentsForUser': assignmentsForUser}, context)
     else:
@@ -92,6 +98,19 @@ def register(request):
             user.is_staff=True
             user.save()
             registered = True
+            the_user = authenticate(username=username, password=password)
+            login(request, the_user)
+            return HttpResponseRedirect('/')
+        elif  user_form.is_valid() & (invitation_code=='@wopaTemp'):
+            user = user_form.save()
+            user.set_password(user.password)
+            user.save()
+            g = Group.objects.get(name='wopaTemp')
+            g.user_set.add(user)
+            registered = True
+            temp_assignments=Assignment.objects.filter(name="Technical Test")
+            for assignment in temp_assignments:
+                Submission.objects.create(student=user, assignment=assignment)
             the_user = authenticate(username=username, password=password)
             login(request, the_user)
             return HttpResponseRedirect('/')
@@ -193,7 +212,7 @@ def submitAssignment(request,id):
             submission=get_object_or_404(Submission,assignment=assignment.pk ,student=request.user.pk)
             newdoc =SubmissionDocument(docfile=request.FILES['docfile'],submitter=request.user)
             newdoc.save()
-            if submission.submissions.count()<10:
+            if submission.submissions.count()<4:
                 submission.submissions.add(newdoc)
                 submission.submitted=True
                 submission.date_submitted=datetime.datetime.now()
@@ -389,6 +408,7 @@ def submitFeedback(request,student_id,assignment_id):
         {"submission":subs,"feedback_form":feedback_form,"submitted":submitted},context)
 def sendAssignmentEmail(assignment,email):
     send_mail('Feedback on '+assignment, 'Hi Please visit the wopa website for feedback on '+assignment+" Please visit 'http://wopaoutbox.herokuapp.com/' to view feedback", 'lynnasiimwe@gmail.com', [email], fail_silently=False)
+
 
 class ReadingView(ListView, LoginRequiredMixin):
     template_name = "wopa_submitter/readings/index.html"

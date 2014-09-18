@@ -26,11 +26,11 @@
            {{submission.student.first_name}}
            </td>
                 <td>
-                  {% if submission.feedback %}
+               {% if submission.feedback %}
                  Feedback given
                {% else %}
-             <a href="{% url 'submitFeedback' submission.student.pk submission.assignment.pk %}"> Click to give feedback</a>
-              {% endif %}
+                   <a href="{% url 'submitFeedback' submission.student.pk submission.assignment.pk %}"> Click to give feedback</a>
+               {% endif %}
            </td>
           
           

@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+{% load has_group %}
 <html lang="en">
 <head>
     <meta http-equiv="content-type" content="text/html; charset=UTF-8">
@@ -49,8 +50,9 @@
 <div class="container">
     <div class="row">
         <div class="col-md-3">
+            <ul class="nav nav-pills nav-stacked" id="userMenu">
            {% if user.is_staff %}
-           <ul class="nav nav-pills nav-stacked" id="userMenu">
+           
                 <li><a href="{% url 'readings' %}"><i class="glyphicon glyphicon-book"></i> Class
                     Readings</a></li>
                 <li><a href="{% url 'allAssignments' %}"><i class="glyphicon glyphicon-envelope"></i>
@@ -65,8 +67,10 @@
 
             </ul>
            {% else %}
-           <ul class="nav nav-pills nav-stacked" id="userMenu">
-                <li><a href="{% url 'readings' %}"><i class="glyphicon glyphicon-book"></i> Class
+             {% if user|has_group:"wopaTemp" %} 
+                <li><a href="/"> Welcome to WOPA Techincal Application</a></li>
+              {% else %}
+                 <li><a href="{% url 'readings' %}"><i class="glyphicon glyphicon-book"></i> Class
                     Readings</a></li>
                 <li><a href="{% url 'assignments' %}"><i class="glyphicon glyphicon-envelope"></i>
                     Assignments</a>
@@ -76,6 +80,9 @@
                 </li>
                
             </ul>
+           {% endif %}
+           <ul class="nav nav-pills nav-stacked" id="userMenu">
+          
            {% endif %}
             
         </div>
