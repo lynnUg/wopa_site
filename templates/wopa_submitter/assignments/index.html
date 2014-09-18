@@ -17,6 +17,10 @@
                 <th>
                     Assignment
                 </th>
+                 <th>
+                    Deadline
+                    Date
+                </th>
                 <th>
                     Submission status
                 </th>
@@ -40,6 +44,9 @@
            <p>{{assignment.assignment.name}}</p>
           <a href="{% url 'viewAssignment' assignment.assignment.pk %}"> View or Submit Assignment</a>
 
+           </td>
+             <td>
+          {{assignment.assignment.due_date}}
            </td>
             <td>
           {{assignment.submitted}}
