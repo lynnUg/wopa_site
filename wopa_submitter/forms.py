@@ -15,7 +15,7 @@ class UserForm(forms.ModelForm):
 
 class AssignmentForm(forms.ModelForm):
     name = forms.CharField()
-    about = forms.CharField(widget=forms.Textarea(attrs={'cols': 10, 'rows': 200}))
+    about = forms.CharField(widget=forms.Textarea)
 
     class Meta:
         model = Assignment
@@ -35,7 +35,7 @@ class SubmissionDocumentForm(forms.ModelForm):
     class Meta:
             model = SubmissionDocument
             exclude=('submitter','filename')
-            
+
 class ReadingForm(forms.ModelForm):
     name = forms.CharField()
     message = forms.CharField(widget=forms.Textarea)
