@@ -63,9 +63,6 @@ def index(request):
     if not request.user.is_staff:
         assignmentsForUser = Submission.objects.filter(student=request.user)
         return render_to_response('wopa_submitter/assignments/index.html', {'assignmentsForUser': assignmentsForUser}, context)
-    elif group in request.user.groups.all():
-        assignmentsForUser = Submission.objects.filter(student=request.user)
-        return render_to_response('wopa_submitter/assignments/index.html', {'assignmentsForUser': assignmentsForUser}, context)
     else:
         return allAssignments(request)
 

@@ -43,6 +43,7 @@ INSTALLED_APPS = (
     'south',
     #'booking',
     #'reservations',
+    'password_reset',
 )
 
 MIDDLEWARE_CLASSES = (

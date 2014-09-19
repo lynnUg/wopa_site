@@ -42,6 +42,7 @@ urlpatterns = patterns('',
                       #url(r'^booking/', include('booking.urls')),
                        #url(r'^reservations/', include('reservations.urls')),
                        (r'^booking/',TemplateView.as_view(template_name="wopa_submitter/wopainterviews/booking.html")),
+                       url(r'^password-reset/',include('password_reset.urls')),
 
 
 ) #+ static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
