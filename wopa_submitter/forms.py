@@ -19,7 +19,7 @@ class AssignmentForm(forms.ModelForm):
 
     class Meta:
         model = Assignment
-        fields = ('name', 'about', 'is_published','due_date')
+        fields = ('name', 'about', 'is_published','due_date','groups')
 
 
 class AssignmentDocumentForm(forms.ModelForm):
@@ -42,7 +42,7 @@ class ReadingForm(forms.ModelForm):
 
     class Meta:
         model = Reading
-        fields = ('name', 'message', )
+        fields = ('name', 'message', 'is_published')
 
 
 class ReadingDocumentForm(forms.ModelForm):

@@ -1,5 +1,5 @@
 from django.db import models
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User,Group
 # Create your models here.
 
 class Assignment(models.Model):
@@ -8,6 +8,7 @@ class Assignment(models.Model):
     details = models.TextField()
     is_published = models.BooleanField(default=False)
     due_date = models.DateField()
+    groups= models.ManyToManyField(Group,null=True)
 
     def __unicode__(self):
         return self.name
@@ -51,6 +52,7 @@ class ReadingDocuments(models.Model):
 class Reading(models.Model):
     name = models.CharField(max_length=250)
     message = models.TextField()
+    is_published = models.BooleanField(default=False)
     reading=models.ForeignKey(ReadingDocuments,null=True)
 
 class AssignmentDocument(models.Model):

@@ -68,9 +68,14 @@
             </ul>
            {% else %}
              {% if user|has_group:"wopaTemp" %} 
-                <li> Welcome to WOPA Techincal Application</li>
-                 <li><a href="/"> Technical test</a></li>
-                 <li><a href="http://wopaoutbox.herokuapp.com/booking"> Book slot for onsite interview</a></li>
+                <!--<li> Welcome to WOPA Techincal Application</li>-->
+                <!-- <li><a href="/"> Technical test</a></li>-->
+                <!--  <li><a href="http://wopaoutbox.herokuapp.com/booking"> Book slot for onsite interview</a></li>-->
+                <li><a href="{% url 'readings' %}"><i class="glyphicon glyphicon-book"></i> Class
+                    Readings</a></li>
+                <li><a href="{% url 'assignments' %}"><i class="glyphicon glyphicon-envelope"></i>
+                    Assignments</a>
+                </li>
               {% else %}
                  <li><a href="{% url 'readings' %}"><i class="glyphicon glyphicon-book"></i> Class
                     Readings</a></li>

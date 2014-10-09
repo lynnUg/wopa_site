@@ -39,9 +39,10 @@ urlpatterns = patterns('',
                       url(r'^stats/$', views.statsStudents, name='stats'),
                       url(r'^statsGraph/$', views.statsGraph, name='stats2'),
                       url(r'^technicalInterview/$', views.technicalInterview, name='technicalInterview'),
+                     # url(r'sendAssignmentEmail/$',views.sendAssignmentEmail, name='sendAssignmentEmail')
                       #url(r'^booking/', include('booking.urls')),
                        #url(r'^reservations/', include('reservations.urls')),
-                       (r'^booking/',TemplateView.as_view(template_name="wopa_submitter/wopainterviews/booking.html")),
+                       #(r'^booking/',TemplateView.as_view(template_name="wopa_submitter/wopainterviews/booking.html")),
                        url(r'^password-reset/',include('password_reset.urls')),
 
 

@@ -124,11 +124,11 @@ def register(request):
         {'user_form': user_form, 'user_errors': user_form.errors, 'registered': registered,'invitation_code_error':invitation_code_error},
         context)
 
-def assignAssignments(assignment):
-     users = User.objects.all()
+def assignAssignments(assignment,group_name):
+     users = User.objects.filter(groups__name=group_name)
      for student in users:
-        if not student.is_staff:
             Submission.objects.create(student=student, assignment=assignment)
+            sendAssignmentEmail(assignment,student)
 @staff_member_required
 def createAssignment(request):   
     context = RequestContext(request)
@@ -143,7 +143,10 @@ def createAssignment(request):
             newdoc.save()
             #print AssignmentDocument.objects.all()
             if assignment.is_published == True:
-                assignAssignments(assignment)
+                for thegroup in assignment.groups.all():
+                    #print "adding to group"
+                    assignAssignments(assignment,thegroup.name)
+                print "here"
             created = True;
 
         else:
@@ -175,13 +178,15 @@ def updateAssignment(request,id):
         assignment_form = AssignmentForm(request.POST,instance=assignment)
         assignment_document_form=AssignmentDocumentForm(request.POST,request.FILES,instance=assignment_doc)
         if assignment_form.is_valid() &assignment_document_form.is_valid():
+            print " assigment",assignment
+            print "assignment form",assignment_form
             assignment= assignment_form.save()
             assignment_doc=assignment_document_form.save()
-            
             if assignment_form.cleaned_data['is_published'] == True:
-                 submissions=Submission.objects.filter(assignment=assignment)
-                 if len(submissions)<=0:
-                    assignAssignments(assignment)
+                for thegroup in assignment.groups.all():
+                    assignAssignments(assignment,thegroup.name) 
+                #assignAssignments(assignment,group_name)
+                print "here"
             created=True
 
         else:
@@ -249,7 +254,6 @@ def createReading(request):
             reading = reading_form.save()
             reading.reading=newreading
             reading.save()
-            
             #print AssignmentDocument.objects.all()
             created = True;
 
@@ -265,12 +269,9 @@ def createReading(request):
 @login_required
 def getReadings(request):
     context = RequestContext(request)
-    if not request.user.is_staff:
-        readings = Reading.objects.all()
-        return render_to_response('wopa_submitter/readings/index.html', {'readings': readings}, context)
-    else:
-        readings = Reading.objects.all()
-        return render_to_response('wopa_submitter/readings/list.html', {'readings': readings}, context)
+    readings = Reading.objects.all()
+    return render_to_response('wopa_submitter/readings/index.html', {'readings': readings}, context)
+   
 @login_required
 def downloadReading(request, id):
 
@@ -397,13 +398,19 @@ def submitFeedback(request,student_id,assignment_id):
             feedback.save()
             subs.feedback=feedback
             subs.save()
-            sendAssignmentEmail(subs.assignment.name,subs.student.email)
+            sendFeedbackEmail(subs.assignment.name,subs.student.email)
             submitted="Feedback submitted"
     feedback_form = FeedbackForm()
     return render_to_response('wopa_submitter/feedback/create.html',
         {"submission":subs,"feedback_form":feedback_form,"submitted":submitted},context)
-def sendAssignmentEmail(assignment,email):
-    send_mail('Feedback on '+assignment, 'Hi Please visit the wopa website for feedback on '+assignment+" Please visit 'http://wopaoutbox.herokuapp.com/' to view feedback", 'lynnasiimwe@gmail.com', [email], fail_silently=False)
+def sendAssignmentEmail(assignment,user):
+    name,class_number=assignment.name.split()
+    send_mail('Technical class Readings and '+assignment.name, "Hi "+user.first_name+", \nNotes and Assignment for technical class "+class_number+" are up on the site.Please visit the wopa website to view notes 'http://wopaoutbox.herokuapp.com/, \n\nP.S Assignment is compulsory and the readings are not \n\nRegards, \nLynn Asiimwe", 'lynnasiimwe@gmail.com', [user.email], fail_silently=False)
+def sendNotesEmail(class_number,email):
+    send_mail('Technical class '+class_number, "Hi ladies , \nNotes for technical class "+class_number+" are up on the site.Please visit the wopa website to view notes 'http://wopaoutbox.herokuapp.com/' \n\nRegards, \nLynn Asiimwe", 'lynnasiimwe@gmail.com', [email], fail_silently=False)
+
+def sendFeedbackEmail(assignment,email):
+    send_mail('Feedback on assignment '+assignment, 'Hi Please visit the wopa website for feedback on '+assignment+" Please visit 'http://wopaoutbox.herokuapp.com/' to view feedback", 'lynnasiimwe@gmail.com', [email], fail_silently=False)
 
 @staff_member_required
 def technicalInterview(request):

@@ -23,6 +23,9 @@ class wopaViewsTestCase(TestCase):
     def test_register(self):
         resp = self.client.get('/register/')
         self.assertEqual(resp.status_code, 200)
+    def test_send_email(self):
+        #resp=self.client.get("sendAssignmentEmail")
+        pass
 
     def test_stuAssignment(self):
         pass
