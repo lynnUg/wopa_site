@@ -127,6 +127,7 @@ def register(request):
 def assignAssignments(assignment,group_name):
      users = User.objects.filter(groups__name=group_name)
      for student in users:
+            print "student "+ student.email
             Submission.objects.create(student=student, assignment=assignment)
             sendAssignmentEmail(assignment,student)
 @staff_member_required
@@ -405,7 +406,8 @@ def submitFeedback(request,student_id,assignment_id):
         {"submission":subs,"feedback_form":feedback_form,"submitted":submitted},context)
 def sendAssignmentEmail(assignment,user):
     name,class_number=assignment.name.split()
-    send_mail('Technical class Reading and '+assignment.name, "Hi "+user.first_name+", \nReading and Assignment for technical class "+class_number+" are up on the site.Please visit the wopa website to view class reading and assignment 'http://wopaoutbox.herokuapp.com/, \n\nP.S Assignment is compulsory and the readings is not \n\nRegards, \nLynn Asiimwe", 'lynnasiimwe@gmail.com', [user.email], fail_silently=False)
+    send_mail('Technical class Reading and '+assignment.name, "Hi "+user.first_name+", \nReading and Assignment for technical class "+class_number+" are up on the site.Please visit the wopa website to view class reading and assignment http://wopaoutbox.herokuapp.com/ \n\nP.S Assignment is compulsory and the readings is not \n\nRegards, \nLynn Asiimwe", 'lynnasiimwe@gmail.com', [user.email], fail_silently=False)
+    
 def sendNotesEmail(class_number,email):
     send_mail('Technical class '+class_number, "Hi ladies , \nNotes for technical class "+class_number+" are up on the site.Please visit the wopa website to view notes 'http://wopaoutbox.herokuapp.com/' \n\nRegards, \nLynn Asiimwe", 'lynnasiimwe@gmail.com', [email], fail_silently=False)
 
