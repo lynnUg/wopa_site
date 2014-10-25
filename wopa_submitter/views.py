@@ -406,13 +406,13 @@ def submitFeedback(request,student_id,assignment_id):
         {"submission":subs,"feedback_form":feedback_form,"submitted":submitted},context)
 def sendAssignmentEmail(assignment,user):
     name,class_number=assignment.name.split()
-    send_mail('Technical class Reading and '+assignment.name, "Hi "+user.first_name+", \nReading and Assignment for technical class "+class_number+" are up on the site.Please visit the wopa website to view class reading and assignment http://wopaoutbox.herokuapp.com/ \n\nP.S Assignment is compulsory and the readings is not \n\nRegards, \nLynn Asiimwe", 'lynnasiimwe@gmail.com', [user.email], fail_silently=False)
+    send_mail('Technical class Reading and '+assignment.name, "Hi "+user.first_name+", \n Reading and Assignment for technical class "+class_number+" are up on the site.Please visit the wopa website to view class reading and assignment http://wopaoutbox.herokuapp.com/ \n\nP.S Assignment is compulsory and the readings is not \n\nRegards, \nLynn Asiimwe", 'lynnasiimwe@gmail.com', [user.email], fail_silently=False)
     
 def sendNotesEmail(class_number,email):
-    send_mail('Technical class '+class_number, "Hi ladies , \nNotes for technical class "+class_number+" are up on the site.Please visit the wopa website to view notes 'http://wopaoutbox.herokuapp.com/' \n\nRegards, \nLynn Asiimwe", 'lynnasiimwe@gmail.com', [email], fail_silently=False)
+    send_mail('Technical class '+class_number, "Hi ladies , \n Notes for technical class "+class_number+" are up on the site.Please visit the wopa website to view notes 'http://wopaoutbox.herokuapp.com/' \n\nRegards, \nLynn Asiimwe", 'lynnasiimwe@gmail.com', [email], fail_silently=False)
 
 def sendFeedbackEmail(assignment,email):
-    send_mail('Feedback on assignment '+assignment, 'Hi Please visit the wopa website for feedback on '+assignment+" Please visit 'http://wopaoutbox.herokuapp.com/' to view feedback", 'lynnasiimwe@gmail.com', [email], fail_silently=False)
+    send_mail('Feedback on '+assignment, 'Hi Please visit the wopa website for feedback on '+assignment+" Please visit http://wopaoutbox.herokuapp.com/ to view feedback", 'lynnasiimwe@gmail.com', [email], fail_silently=False)
 
 @staff_member_required
 def technicalInterview(request):
