@@ -64,8 +64,8 @@
            <td>
           
            {% if assignment.feedback %}
-               <textarea> {{assignment.feedback.thefeedback}}</textarea>
-            
+             
+            <textarea cols="40" id="id_thefeedback" name="thefeedback" rows="10">{{assignment.feedback.thefeedback}}</textarea>
                {% else %}
                  
                {% endif %}
