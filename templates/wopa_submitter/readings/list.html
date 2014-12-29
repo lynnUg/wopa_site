@@ -1,38 +1,42 @@
 {% extends "wopa_submitter/base.html" %}
 {% block content %}
- <button id="btn-create" type="button" class="btn btn-info" onclick="window.location.href='/createreading'"><i class="icon-hand-right"></i> &nbsp Create Reading</button>
     <div class="col-md-9">
-        <a href="#"><strong><i class="glyphicon glyphicon-dashboard"></i> Assignments</strong></a>
+        <a href="#"><strong><i class="glyphicon glyphicon-dashboard"></i> Class Readings</strong></a>
         <hr>
         <table id="example" class="table table-striped table-bordered table-condensed">
             <thead>
             <tr>
                 <th>
-                    Reading
+                    Reading name
                 </th>
                 <th>
-                    Reading About
+                    About
                 </th>
-                
-                
+                <th>
+                    Reading Link
+                </th>
 
             
         </tr>
         </thead>
         <tbody>
-          {% for reading in readings %}
+          {% for reading in readings%}
           <tr>
                 <td>
            <p>{{reading.name}}</p>
-          <a href="{% url 'updateReading' reading.pk %}"> View or update Reading</a>
+          
 
            </td>
-          
+            <td>
+          {{reading.message}}
+           </td>
             <td>
               
-           {{reading.message}}
+              <a href="{% url 'downloadReading' reading.reading.pk %}" >{{reading.reading.docfile}}</a>
+              
+           
            </td>
-            
+           
          </tr>
           {% endfor %}
         </tbody>

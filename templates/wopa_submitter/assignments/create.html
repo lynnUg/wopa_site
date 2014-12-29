@@ -1,9 +1,7 @@
 {% extends "wopa_submitter/base.html" %}
 
 {% block content %}
-   {% if created %}
-      <h1>Thanks for creating/updating assignment</h1>
-    {% else %}
+   
          <h1>Create Assignment </h1>
         <form id="user_form" method="post" action="{{redirectPage}}"
                 enctype="multipart/form-data">

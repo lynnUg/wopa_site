@@ -9,3 +9,4 @@ media/
 media/*
 workspace.xml
 .idea/workspace.xml
+local_settings.py

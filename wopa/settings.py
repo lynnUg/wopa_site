@@ -10,9 +10,9 @@ https://docs.djangoproject.com/en/1.6/ref/settings/
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 import os
+BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-PROJECT_PATH = os.path.join(os.path.dirname(__file__), '..')
+
 
 
 # Quick-start development settings - unsuitable for production
@@ -40,10 +40,9 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
     'storages',
     'wopa_submitter',
-    'south',
-    #'booking',
-    #'reservations',
+    #'south',
     'password_reset',
+    
 )
 
 MIDDLEWARE_CLASSES = (
@@ -60,15 +59,7 @@ ROOT_URLCONF = 'wopa.urls'
 WSGI_APPLICATION = 'wopa.wsgi.application'
 
 
-# Database
-# https://docs.djangoproject.com/en/1.6/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
-    }
-}
 # Internationalization
 # https://docs.djangoproject.com/en/1.6/topics/i18n/
 
@@ -83,34 +74,50 @@ USE_L10N = True
 USE_TZ = True
 
 LOGIN_URL = '/login/'
-
-EMAIL_HOST = 'smtp.sendgrid.net'
-EMAIL_HOST_USER = 'lynnug'
-EMAIL_HOST_PASSWORD = 'asiimwe18!'
+LOGIN_REDIRECT_URL  = '/website/home'
+EMAIL_HOST = '*****'
+EMAIL_HOST_USER = '****'
+EMAIL_HOST_PASSWORD = '****'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 
 import os
 
 import local_settings
-AWS_STORAGE_BUCKET_NAME = 'wopa-outbox'
 
-STATICFILES_STORAGE = 'storages.backends.s3boto.S3BotoStorage'
-DEFAULT_FILE_STORAGE = 'storages.backends.s3boto.S3BotoStorage'
-AWS_ACCESS_KEY_ID = local_settings.AWS_ACCESS_KEY_ID 
-AWS_SECRET_ACCESS_KEY = local_settings.AWS_SECRET_ACCESS_KEY
 
-STATIC_URL = 'http://' + AWS_STORAGE_BUCKET_NAME + '.s3.amazonaws.com/'
-ADMIN_MEDIA_PREFIX = STATIC_URL + 'admin/'
-TEMPLATE_DIRS = (
-    os.path.join(PROJECT_PATH, 'templates/'),
-
-)
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/1.6/howto/static-files/
 import dj_database_url
 try:
+    # Static files (CSS, JavaScript, Images)
+    # https://docs.djangoproject.com/en/1.6/howto/static-files/
+    
     DATABASES = {'default': dj_database_url.config(default=os.environ['DATABASE_URL'])}
+    AWS_STORAGE_BUCKET_NAME = 'wopa-outbox'
+
+    STATICFILES_STORAGE = 'storages.backends.s3boto.S3BotoStorage'
+    DEFAULT_FILE_STORAGE = 'storages.backends.s3boto.S3BotoStorage'
+    AWS_ACCESS_KEY_ID = local_settings.AWS_ACCESS_KEY_ID 
+    AWS_SECRET_ACCESS_KEY = local_settings.AWS_SECRET_ACCESS_KEY
+
+    STATIC_URL = 'http://' + AWS_STORAGE_BUCKET_NAME + '.s3.amazonaws.com/'
+    ADMIN_MEDIA_PREFIX = STATIC_URL + 'admin/'
+    TEMPLATE_DIRS = (
+        os.path.join(BASE_DIR, 'templates/'),
+
+    )
 except:
-    DATABASES = {'default': dj_database_url.config(default=local_settings.DATABASE_URL)}
+    DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+    }
+}
+    STATIC_URL='/static/'
+    STATICFILES_DIRS = (
+os.path.join(BASE_DIR, 'static/'),
+)
+    TEMPLATE_DIRS = (
+        os.path.join(BASE_DIR, 'templates/'),
+
+    )
   

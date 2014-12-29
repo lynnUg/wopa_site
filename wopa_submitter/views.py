@@ -15,126 +15,113 @@ from django.contrib.auth.models import User
 import datetime
 from django.utils import simplejson
 from django.core.mail import send_mail
-
-
-def user_login(request):
-    context = RequestContext(request)
-    account_diasbled = False
-    invalid_account = False
-    username = ''
-    password = ''
-    if request.method == 'POST':
-        username = request.POST['username']
-        password = request.POST['password']
-        user = authenticate(username=username, password=password)
-
-        if user:
-            if user.is_active:
-
-                login(request, user)
-                print "logged in"
-                return HttpResponseRedirect('/')
-            else:
-                # return HttpResponse("Your WOPA account is disabled.")
-                account_diasbled = True
-                invalid_account = True
-
-        else:
-            print "Invalid login details: {0}, {1}".format(username, password)
-            invalid_account = True
-            # return HttpResponse("Invalid login details supplied.")
-
-    return render_to_response('wopa_submitter/auth/index.html',
-                              {'account_diasbled': account_diasbled, 'invalid_account': invalid_account,
-                               'username': username, 'password': password}, context)
-
-
-@login_required
-def user_logout(request):
-    print "in logout"
-    logout(request)
-    return HttpResponseRedirect('/')
-
-
-@login_required
-def index(request):
-    context = RequestContext(request)
-    group = Group.objects.get(name='wopaTemp')
-    if not request.user.is_staff:
-        assignmentsForUser = Submission.objects.filter(student=request.user)
-        return render_to_response('wopa_submitter/assignments/index.html', {'assignmentsForUser': assignmentsForUser}, context)
-    else:
-        return allAssignments(request)
-
-
-def register(request):
-    context = RequestContext(request)
-    registered = False
-    invitation_code_error=False
-    if request.method == 'POST':
+from django.views.generic.edit import CreateView
+from django.views.generic.list import ListView
+from django.views.generic.detail import DetailView
+class UserCreateView(CreateView):
+    template_name="wopa_submitter/auth/register.html"
+    model = User
+    fields = ['username']
+    
+        
+    def post(self, request):
+        context = RequestContext(request)
         user_form = UserForm(data=request.POST)
         invitation_code=request.POST['code']
         username = request.POST['username']
         password = request.POST['password']
-        print invitation_code
         if user_form.is_valid() & (invitation_code=='@wopa256'):
             user = user_form.save()
             user.set_password(user.password)
             user.save()
-            registered = True
-            published_assignments=Assignment.objects.filter(is_published=True)
-            for assignment in published_assignments:
-                Submission.objects.create(student=user, assignment=assignment)
-            the_user = authenticate(username=username, password=password)
-            login(request, the_user)
-            return HttpResponseRedirect('/')
+            self.assign_assignments_old(user)
+            return HttpResponseRedirect('/website/register-success/')
         elif user_form.is_valid() & (invitation_code=='@wopa123'):
             user = user_form.save()
             user.set_password(user.password)
             user.is_staff=True
             user.save()
-            registered = True
-            the_user = authenticate(username=username, password=password)
-            login(request, the_user)
-            return HttpResponseRedirect('/')
+            return HttpResponseRedirect('/website/register-success/')
         elif  user_form.is_valid() & (invitation_code=='@wopaTemp'):
             user = user_form.save()
             user.set_password(user.password)
             user.save()
-            g = Group.objects.get(name='wopaTemp')
-            g.user_set.add(user)
-            registered = True
-            temp_assignments=Assignment.objects.filter(name="Technical Test")
-            for assignment in temp_assignments:
-                Submission.objects.create(student=user, assignment=assignment)
-            the_user = authenticate(username=username, password=password)
-            login(request, the_user)
-            return HttpResponseRedirect('/')
+            self.add_user_to_group(user)
+            self.assign_assignments(user)
+            return HttpResponseRedirect('/website/register-success/')
         else:
             if not((invitation_code=='@wopa123') or (invitation_code=='@wopa256')):
                 invitation_code_error=True
-
-
-            print user_form.errors
-    else:
-        user_form = UserForm()
-
-    return render_to_response(
-        'wopa_submitter/auth/index.html',
-        {'user_form': user_form, 'user_errors': user_form.errors, 'registered': registered,'invitation_code_error':invitation_code_error},
+        return render_to_response(
+        'wopa_submitter/auth/register.html',
+        {'user_form': user_form, 'user_errors': user_form.errors,'invitation_code_error':invitation_code_error},
         context)
+    def add_user_to_group(self,user):
+        g=Group.objects.get(name='wopaTemp')
+        g.user_set.add(user)
+    def assign_assignments(self,user):
+        temp_assignments=Assignment.objects.filter(name="Technical Test")
+        for assignment in temp_assignments:
+            Submission.objects.create(student=user, assignment=assignment)
+    def assign_assignments_old(self,user):
+        published_assignments=Assignment.objects.filter(is_published=True)
+        for assignment in published_assignments:
+                Submission.objects.create(student=user, assignment=assignment)
 
-def assignAssignments(assignment,group_name):
-     users = User.objects.filter(groups__name=group_name)
-     for student in users:
-            print "student "+ student.email
-            Submission.objects.create(student=student, assignment=assignment)
-            sendAssignmentEmail(assignment,student)
-@staff_member_required
-def createAssignment(request):   
-    context = RequestContext(request)
-    created = False;
-    if request.method == 'POST':
+class SubmissionListView(ListView):
+    context_object_name = 'submissions'
+    template_name = 'wopa_submitter/submissions/list.html'
+    paginate_by = 10
+
+    def get_queryset(self):
+        return Submission.objects.filter(student=self.request.user)
+class ReadingListView(ListView):
+    context_object_name="readings"
+    template_name='wopa_submitter/readings/list.html'
+    paginate_by=10
+    model=Reading
+class AssignmentListView(ListView):
+    context_object_name="assignments"
+    template_name='wopa_submitter/assignments/list.html'
+    paginate_by=10
+    model=Assignment
+
+class ReadingCreateView(CreateView):
+    template_name='wopa_submitter/readings/create.html'
+    def get(self):
+        reading_form = ReadingForm
+        reading_document_form = ReadingDocumentForm
+        return render_to_response('wopa_submitter/readings/create.html',
+        {'reading_form': reading_form,'reading_document_form': reading_document_form,},context)
+    def post(self):
+        reading_form = ReadingForm(request.POST)
+        reading_document_form=ReadingDocumentForm(request.POST,request.FILES)
+        if reading_form.is_valid() & reading_document_form.is_valid():
+            newreading =ReadingDocuments(docfile=request.FILES['docfile'])
+            newreading.save()
+            reading = reading_form.save()
+            reading.reading=newreading
+            reading.save()
+            return HttpResponseRedirect('')
+
+        return render_to_response('wopa_submitter/readings/create.html',
+        {'reading_form': reading_form,'reading_document_form': reading_document_form,},context)  
+    def sendReadingEmail(class_number,email):
+    send_mail('Technical class '+class_number, "Hi ladies , \n Notes for technical class "+
+        class_number+" are up on the site.Please visit the wopa website to view notes 'http://wopaoutbox.herokuapp.com/' \n\nRegards, \nLynn Asiimwe", 'lynnasiimwe@gmail.com', [email], fail_silently=False)
+            
+
+
+class AssignmentCreateView(CreateView):
+    template_name='wopa_submitter/assignments.create.html'
+    def get(self,request):
+        context = RequestContext(request)
+        assignment_form = AssignmentForm
+        assignment_document_form = AssignmentDocumentForm
+        return render_to_response('wopa_submitter/assignments/create.html',
+        {'assignment_form': assignment_form,'assignment_document_form': assignment_document_form},context)
+    def post(self,request):
+        context = RequestContext(request)
         assignment_form = AssignmentForm(request.POST)
         assignment_document_form=AssignmentDocumentForm(request.POST,request.FILES)
         if assignment_form.is_valid() & assignment_document_form.is_valid():
@@ -142,23 +129,101 @@ def createAssignment(request):
             assignment.save()
             newdoc =AssignmentDocument(docfile=request.FILES['docfile'],assignment=assignment)
             newdoc.save()
-            #print AssignmentDocument.objects.all()
             if assignment.is_published == True:
                 for thegroup in assignment.groups.all():
-                    #print "adding to group"
-                    assignAssignments(assignment,thegroup.name)
-                print "here"
-            created = True;
+                    self.assignAssignments(assignment,thegroup.name)
+            return HttpResponseRedirect('')
+        return render_to_response('wopa_submitter/assignments/create.html',
+        {'assignment_form': assignment_form,'assignment_document_form': assignment_document_form, 
+        'form_errors':assignment_form.errors},context)
+    def assignAssignments(assignment,group_name):
+     users = User.objects.filter(groups__name=group_name)
+     for student in users:
+            print "student "+ student.email
+            Submission.objects.create(student=student, assignment=assignment)
+            self.sendAssignmentEmail(assignment,student)
 
-        else:
-            print assignment_form.errors
+    def sendAssignmentEmail(assignment,user):
+        name,class_number=assignment.name.split()
+        send_mail('Technical class Reading and '+assignment.name, "Hi "+user.first_name+", \n Reading and Assignment for technical class "+
+         class_number+" are up on the site.Please visit the wopa website to view class reading and assignment http://wopaoutbox.herokuapp.com/ \n\nP.S Assignment is compulsory and the readings is not \n\nRegards, \nLynn Asiimwe", 'lynnasiimwe@gmail.com', [user.email], fail_silently=False)
+
+    
+
+class ReadingUpdateView(CreateView):
+    def get(self,request):
+        context = RequestContext(request)
+        eading = get_object_or_404(Reading, id=id)
+        reading_form= ReadingForm(request.POST or None, instance=reading)
+        reading_doc = get_object_or_404(ReadingDocuments,  pk=reading.reading.pk)
+        reading_document_form=ReadingDocumentForm(request.POST or None,request.FILES or None,instance=reading_doc)
+        return render_to_response('wopa_submitter/readings/update.html',
+        {'reading_form': reading_form, 'reading_document_form': reading_document_form,'redirectPage':'/updatereading/'+id+'/'},
+        context)
+    def post(self,request):
+        context = RequestContext(request)
+        reading = get_object_or_404(Reading, id=id)
+        reading_doc = get_object_or_404(ReadingDocuments, pk=reading.reading.pk)
+        reading_form = ReadingForm(request.POST,instance=reading)
+        reading_document_form=ReadingDocumentForm(request.POST,request.FILES,instance=reading_doc)
+        if reading_form.is_valid() &reading_document_form.is_valid():
+            reading= reading_form.save()
+            reading_doc=reading_document_form.save()
+        return render_to_response('wopa_submitter/readings/update.html',
+        {'reading_form': reading_form, 'reading_document_form': reading_document_form,'redirectPage':'/updatereading/'+id+'/'},
+        context)
+                
+
+class AssignmentUpdateView(CreateView):
+    def get(self,request):
+        context = RequestContext(request)
+        assignment = get_object_or_404(Assignment, id=id)
+        assignment_form= AssignmentForm(request.POST or None, instance=assignment)
+        assignment_doc = get_object_or_404(AssignmentDocument, assignment=assignment.pk)
+        assignment_document_form=AssignmentDocumentForm(request.POST or None,request.FILES or None,instance=assignment_doc)
+        return render_to_response('wopa_submitter/assignments/update.html',
+        {'assignment_form': assignment_form, 'assignment_document_form': assignment_document_form,'redirectPage':'/updateassignment/'+id+'/'},
+        context)
+    def post(self,request):
+        context = RequestContext(request)
+        assignment = get_object_or_404(Assignment, id=id)
+        assignment_doc = get_object_or_404(AssignmentDocument, assignment=assignment.pk)
+        assignment_form = AssignmentForm(request.POST,instance=assignment)
+        assignment_document_form=AssignmentDocumentForm(request.POST,request.FILES,instance=assignment_doc)
+        if assignment_form.is_valid() &assignment_document_form.is_valid():
+            assignment= assignment_form.save()
+            assignment_doc=assignment_document_form.save()
+            if assignment_form.cleaned_data['is_published'] == True:
+                for thegroup in assignment.groups.all():
+                    self.assignAssignments(assignment,thegroup.name) 
+                return HttpResponseRedirect('')
+        return render_to_response('wopa_submitter/assignments/create.html',
+        {'assignment_form': assignment_form, 'assignment_document_form': assignment_document_form,'redirectPage':'/updateassignment/'+id+'/'},
+        context)
+    def assignAssignments(assignment,group_name):
+     users = User.objects.filter(groups__name=group_name)
+     for student in users:
+            print "student "+ student.email
+            Submission.objects.create(student=student, assignment=assignment)
+            self.sendAssignmentEmail(assignment,student)
+    def sendAssignmentEmail(assignment,user):
+        name,class_number=assignment.name.split()
+        send_mail('Technical class Reading and '+assignment.name, "Hi "+user.first_name+", \n Reading and Assignment for technical class "+
+         class_number+" are up on the site.Please visit the wopa website to view class reading and assignment http://wopaoutbox.herokuapp.com/ \n\nP.S Assignment is compulsory and the readings is not \n\nRegards, \nLynn Asiimwe", 'lynnasiimwe@gmail.com', [user.email], fail_silently=False)
+
+
+
+@login_required
+def home(request):
+    if not request.user.is_staff:
+        return HttpResponseRedirect('/website/student-account/')
     else:
-        assignment_form = AssignmentForm
-        assignment_document_form = AssignmentDocumentForm
+        return HttpResponseRedirect('/website/staff-account/')
+        
 
 
-    return render_to_response('wopa_submitter/assignments/create.html',
-        {'assignment_form': assignment_form,'assignment_document_form': assignment_document_form, 'created': created},context)
+
+
 
 
 def detailAssignment(request,id):
@@ -169,40 +234,7 @@ def detailAssignment(request,id):
         'wopa_submitter/assignments/detail.html',
         {'assignment': assignment,'submission_document_form':submission_document_form},
         context)
-@staff_member_required
-def updateAssignment(request,id):
-    context = RequestContext(request)
-    created=False
-    if request.method == 'POST':
-        assignment = get_object_or_404(Assignment, id=id)
-        assignment_doc = get_object_or_404(AssignmentDocument, assignment=assignment.pk)
-        assignment_form = AssignmentForm(request.POST,instance=assignment)
-        assignment_document_form=AssignmentDocumentForm(request.POST,request.FILES,instance=assignment_doc)
-        if assignment_form.is_valid() &assignment_document_form.is_valid():
-            print " assigment",assignment
-            print "assignment form",assignment_form
-            assignment= assignment_form.save()
-            assignment_doc=assignment_document_form.save()
-            if assignment_form.cleaned_data['is_published'] == True:
-                for thegroup in assignment.groups.all():
-                    assignAssignments(assignment,thegroup.name) 
-                #assignAssignments(assignment,group_name)
-                print "here"
-            created=True
 
-        else:
-            print assignment_form.errors
-    else:
-        assignment = get_object_or_404(Assignment, id=id)
-        print assignment.pk
-        assignment_form= AssignmentForm(request.POST or None, instance=assignment)
-        assignment_doc = get_object_or_404(AssignmentDocument, assignment=assignment.pk)
-        assignment_document_form=AssignmentDocumentForm(request.POST or None,request.FILES or None,instance=assignment_doc)
-        
-    
-    return render_to_response('wopa_submitter/assignments/create.html',
-        {'assignment_form': assignment_form, 'assignment_document_form': assignment_document_form,'created': created,'redirectPage':'/updateassignment/'+id+'/'},
-        context)
 @login_required
 def submitAssignment(request,id):
     context = RequestContext(request)
@@ -242,36 +274,8 @@ def downloadAssignment(request, id):
     object = get_object_or_404(AssignmentDocument, pk=id)
 
     return serve_file(request, object.docfile,save_as=True)
-@staff_member_required
-def createReading(request): 
-    context = RequestContext(request)
-    created = False;
-    if request.method == 'POST':
-        reading_form = ReadingForm(request.POST)
-        reading_document_form=ReadingDocumentForm(request.POST,request.FILES)
-        if reading_form.is_valid() & reading_document_form.is_valid():
-            newreading =ReadingDocuments(docfile=request.FILES['docfile'])
-            newreading.save()
-            reading = reading_form.save()
-            reading.reading=newreading
-            reading.save()
-            #print AssignmentDocument.objects.all()
-            created = True;
-
-        else:
-            print assignment_form.errors
-    else:
-        reading_form = ReadingForm
-        reading_document_form = ReadingDocumentForm
 
 
-    return render_to_response('wopa_submitter/readings/create.html',
-        {'reading_form': reading_form,'reading_document_form': reading_document_form, 'created': created},context)  
-@login_required
-def getReadings(request):
-    context = RequestContext(request)
-    readings = Reading.objects.all()
-    return render_to_response('wopa_submitter/readings/index.html', {'readings': readings}, context)
    
 @login_required
 def downloadReading(request, id):
@@ -280,11 +284,7 @@ def downloadReading(request, id):
     object = get_object_or_404(ReadingDocuments, pk=id)
 
     return serve_file(request, object.docfile,save_as=True)
-@staff_member_required
-def allAssignments(request):
-    context = RequestContext(request)
-    assignments= Assignment.objects.all()
-    return render_to_response('wopa_submitter/assignments/list.html', {'assignments': assignments}, context)
+
 @staff_member_required
 def updateReading(request,id):
     context = RequestContext(request)
@@ -312,36 +312,6 @@ def updateReading(request,id):
         {'reading_form': reading_form, 'reading_document_form': reading_document_form,'created': created,'redirectPage':'/updatereading/'+id+'/'},
         context)
         
-@staff_member_required
-def forceSubmitAssignment(request):
-    context = RequestContext(request)
-    created = True;
-    #assignment=get_object_or_404(Assignment,pk=id)
-    submission=SubmissionForm()
-    submission_document_form=SubmissionDocumentForm()
-    if request.method == 'POST':
-        submission_document_form=SubmissionDocumentForm(request.POST,request.FILES)
-        if submission_document_form.is_valid():
-            #print request.POST['assignment'], request.POST['student']
-            submission=get_object_or_404(Submission,assignment=request.POST['assignment'] ,student=request.POST['student'])
-            newdoc =SubmissionDocument(docfile=request.FILES['docfile'],submitter=request.user)
-            newdoc.save()
-            if submission.submissions.count()<10:
-                submission.submissions.add(newdoc)
-                submission.submitted=True
-                submission.date_submitted=datetime.datetime.now()
-                submission.save()
-            return HttpResponseRedirect('/forceSubmit/')
-        
-
-        else:
-            print submission_document_form.errors
-    else:
-        submission=SubmissionForm()
-        submission_document_form=SubmissionDocumentForm()
-        #assignment_form = AssignmentForm
-    return render_to_response('wopa_submitter/assignments/forceSubmit.html',
-        {'submission_document_form': submission_document_form,'form': submission,'created': created },context)
 @staff_member_required
 def statsStudents(request):
     context = RequestContext(request)
@@ -404,12 +374,9 @@ def submitFeedback(request,student_id,assignment_id):
     feedback_form = FeedbackForm()
     return render_to_response('wopa_submitter/feedback/create.html',
         {"submission":subs,"feedback_form":feedback_form,"submitted":submitted},context)
-def sendAssignmentEmail(assignment,user):
-    name,class_number=assignment.name.split()
-    send_mail('Technical class Reading and '+assignment.name, "Hi "+user.first_name+", \n Reading and Assignment for technical class "+class_number+" are up on the site.Please visit the wopa website to view class reading and assignment http://wopaoutbox.herokuapp.com/ \n\nP.S Assignment is compulsory and the readings is not \n\nRegards, \nLynn Asiimwe", 'lynnasiimwe@gmail.com', [user.email], fail_silently=False)
+
     
-def sendNotesEmail(class_number,email):
-    send_mail('Technical class '+class_number, "Hi ladies , \n Notes for technical class "+class_number+" are up on the site.Please visit the wopa website to view notes 'http://wopaoutbox.herokuapp.com/' \n\nRegards, \nLynn Asiimwe", 'lynnasiimwe@gmail.com', [email], fail_silently=False)
+
 
 def sendFeedbackEmail(assignment,email):
     send_mail('Feedback on '+assignment, 'Hi Please visit the wopa website for feedback on '+assignment+" Please visit http://wopaoutbox.herokuapp.com/ to view feedback", 'lynnasiimwe@gmail.com', [email], fail_silently=False)
@@ -427,13 +394,3 @@ def technicalInterview(request):
 
 
     return render_to_response('wopa_submitter/wopainterviews/index.html', {'submissionsTechnical': filter_submission}, context)
-class ReadingView(ListView, LoginRequiredMixin):
-    template_name = "wopa_submitter/readings/index.html"
-    model = Reading
-    context_object_name = 'readings'
-
-
-class AssignmentsView(ListView, LoginRequiredMixin):
-    template_name = "wopa_submitter/assignments/index.html"
-    model = Assignment
-    context_object_name = "assignments"
